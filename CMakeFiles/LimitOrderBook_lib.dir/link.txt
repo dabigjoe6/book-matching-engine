@@ -1,2 +1,0 @@
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libLimitOrderBook_lib.a CMakeFiles/LimitOrderBook_lib.dir/src/Order/order.cpp.o CMakeFiles/LimitOrderBook_lib.dir/src/Limit/limit.cpp.o CMakeFiles/LimitOrderBook_lib.dir/src/OrderBook/order_book.cpp.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libLimitOrderBook_lib.a
