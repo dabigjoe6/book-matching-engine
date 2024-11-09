@@ -10,13 +10,14 @@ public:
 
 	void addOrder(Order* order);
 
-	int getVolume();	
+	int getVolume();
 	void setVolume(int volume);
 
 	Order* getHeadOrder();
 	Order* getTailOrder();
 
 	void execute(Order* headOrder, Order& order);
+	void execute(int limitVolume, Order& order);
 private: 
 	int limitPrice;
 	Limit* leftChildLimit = nullptr;
