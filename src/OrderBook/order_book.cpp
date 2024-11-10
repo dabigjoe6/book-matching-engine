@@ -81,6 +81,33 @@ void OrderBook::marketOrderHelper(Limit* limit, Order& order) {
 	}
 }
 
+void OrderBook::executeStopOrders(int buyOrSell) {
+	if (buyOrSell) {
+		// TODO: COnfirm if predicate for making stop orders limit orders should be based on limit price or stop price
+		while (lowestStopBuy != nullptr && (lowestSell == nullptr || lowestStopBuy->getLimitPrice() <= lowestSell->getLimitPrice())) {
+			if (lowestStopBuy->getHeadOrder()->getLimitPrice() == 0) {
+				marketOrderHelper(lowestSell, *(lowestStopBuy->getHeadOrder()));
+				//TODO: Update lowestStopBuy -> Delete entire limit or just remove/change head order and tail order
+			} else {
+				addLimitOrder(*(lowestStopBuy->getHeadOrder()));
+				//TODO: Update lowestStopBuy -> Delete entire limit or just remove/change head order and tail order
+
+			}
+		}
+	} else {
+		while (highestStopSell != nullptr && (highestBuy == nullptr || highestStopSell->getLimitPrice() >= highestBuy->getLimitPrice())) {
+			if (highestStopSell->getHeadOrder()->getLimitPrice() == 0) {
+				marketOrderHelper(highestBuy, *(highestStopSell->getHeadOrder()));
+				//TODO: Update lowestStopBuy -> Delete entire limit or just remove/change head order and tail order
+			} else {
+				addLimitOrder(*(highestStopSell->getHeadOrder()));
+				//TODO: Update lowestStopBuy -> Delete entire limit or just remove/change head order and tail order
+
+			}	
+		}
+	}
+}
+
 void OrderBook::addMarketOrder(Order& order) {
 	Limit* edgeLimit = order.getBuyOrSell() ? this->getLowestSell() : this->getHighestBuy();
 
@@ -91,7 +118,7 @@ void OrderBook::addMarketOrder(Order& order) {
 		
 	}
 
-	executeStopOrders();
+	executeStopOrders(order.getBuyOrSell());
 }
 
 void OrderBook::addStopOrderAsMarketOrder(Limit* edgeLimit, Order& order) {
@@ -128,7 +155,7 @@ void OrderBook::addLimitOrder(Order& order) {
 		return;
 	}
 
-	executeStopOrders();
+	executeStopOrders(order.getBuyOrSell());
 }
 
 void OrderBook::addStopOrder(Order& order) {

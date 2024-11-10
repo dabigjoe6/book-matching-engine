@@ -45,6 +45,8 @@ private:
 	void marketOrderHelper(Limit* limit, Order& order);
 	void addStopOrderAsMarketOrder(Limit* edgeLimit, Order& order);
 
+	void executeStopOrders(int buyOrSell);
+
 	void insertLimitIntoAVLTree(int limitPrice, int buyOrSell);
 	void insertStopLimitIntoAVLTree(int stopPrice, int limitPrice, int buyOrSell);
 
