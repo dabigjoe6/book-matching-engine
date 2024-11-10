@@ -82,9 +82,9 @@ void OrderBook::marketOrderHelper(Limit* limit, Order& order) {
 }
 
 void OrderBook::addMarketOrder(Order& order) {
-	Limit* oppositeLimit = order.getBuyOrSell() ? this->getLowestSell() : this->getHighestBuy();
+	Limit* edgeLimit = order.getBuyOrSell() ? this->getLowestSell() : this->getHighestBuy();
 
-	marketOrderHelper(oppositeLimit, order);
+	marketOrderHelper(edgeLimit, order);
 	
 	// TODO: Do we need to do anything with orders that weren't placed? i.e Add to Limit Order?
 	if (order.getShares() != 0) {
@@ -94,15 +94,15 @@ void OrderBook::addMarketOrder(Order& order) {
 	executeStopOrders();
 }
 
-void OrderBook::addStopOrderAsMarketOrder(Limit* oppositeLimit, Order& order) {
+void OrderBook::addStopOrderAsMarketOrder(Limit* edgeLimit, Order& order) {
 
 	// TODO: Confirm what happens when we can't fullfil the market order for the stop order
 	// Do we make the unfullfilled ones limit orders? Or do they become stop orders?
-	if (order.getBuyOrSell() && oppositeLimit != nullptr && order.getStopPrice() <= oppositeLimit->getLimitPrice()) {
-		marketOrderHelper(oppositeLimit, order);
+	if (order.getBuyOrSell() && edgeLimit != nullptr && order.getStopPrice() <= edgeLimit->getLimitPrice()) {
+		marketOrderHelper(edgeLimit, order);
 		return;
-	} else if (!order.getBuyOrSell() && oppositeLimit != nullptr && order.getStopPrice() >= oppositeLimit->getLimitPrice()) {
-		marketOrderHelper(oppositeLimit, order);
+	} else if (!order.getBuyOrSell() && edgeLimit != nullptr && order.getStopPrice() >= edgeLimit->getLimitPrice()) {
+		marketOrderHelper(edgeLimit, order);
 		return;
 	}
 
@@ -110,9 +110,9 @@ void OrderBook::addStopOrderAsMarketOrder(Limit* oppositeLimit, Order& order) {
 }
 
 void OrderBook::addLimitOrder(Order& order) {
-	Limit* oppositeLimit = order.getBuyOrSell() ? this->getLowestSell() : this->getHighestBuy();
+	Limit* edgeLimit = order.getBuyOrSell() ? this->getLowestSell() : this->getHighestBuy();
 
-	marketOrderHelper(oppositeLimit, order);
+	marketOrderHelper(edgeLimit, order);
 
 	if (order.getShares() != 0) {
 		int limitPrice = order.getLimitPrice();
@@ -132,9 +132,9 @@ void OrderBook::addLimitOrder(Order& order) {
 }
 
 void OrderBook::addStopOrder(Order& order) {
-	Limit* oppositeLimit = order.getBuyOrSell() ? this->getLowestSell() : this->getHighestBuy();
+	Limit* edgeLimit = order.getBuyOrSell() ? this->getLowestSell() : this->getHighestBuy();
 	
-	addStopOrderAsMarketOrder(oppositeLimit, order);
+	addStopOrderAsMarketOrder(edgeLimit, order);
 
 	if (order.getShares() != 0) {
 		int stopPrice = order.getStopPrice();
