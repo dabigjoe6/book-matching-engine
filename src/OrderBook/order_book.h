@@ -22,8 +22,8 @@ private:
 	Limit* buyTree = nullptr;
 	Limit* sellTree = nullptr;
 
-	Limit* stopBuyTree;
-	Limit* stopSellTree;
+	Limit* stopBuyTree = nullptr;
+	Limit* stopSellTree = nullptr;
 
 	Limit* highestBuy;
 	Limit* lowestSell;
@@ -34,18 +34,26 @@ private:
 	std::unordered_map<int, Limit*> buyLimitMap;
 	std::unordered_map<int, Limit*> sellLimitMap;
 
+	std::unordered_map<int, Limit*> stopBuyMap;
+	std::unordered_map<int, Limit*> stopSellMap;
+
 	void addMarketOrder(Order& order);
 	void addLimitOrder(Order& order);
-	void addStopLimitOrder(Order& order);
 	void addStopOrder(Order& order);
+	void addStopLimitOrder(Order& order);
 
 	void marketOrderHelper(Limit* limit, Order& order);
+	void addStopOrderAsMarketOrder(Limit* limit, Order& order);
 
 	void insertLimitIntoAVLTree(int limitPrice, int buyOrSell);
+	void insertStopLimitIntoAVLTree(int stopPrice, int limitPrice, int buyOrSell);
+
 	Limit* _insert(Limit* root, int limitPrice);
+
 	void updateHeight(Limit* root);
 	int getHeight(Limit* node);
 	int getBalance(Limit* node);
+
 	Limit* rotateLeft(Limit* root);
 	Limit* rotateRight(Limit* root);
 };

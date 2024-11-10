@@ -6,9 +6,10 @@ class Order;
 class Limit {
 
 public: 
-	Limit(int limitPrice);
+	Limit(int limitPrice, int stopPrice = 0);
 
 	int getLimitPrice();
+	int getStopPrice();
 
 	void addOrder(Order* order);
 
@@ -22,6 +23,7 @@ public:
 	void execute(int limitVolume, Order& order);
 private: 
 	int limitPrice;
+	int stopPrice;
 	
 	Order* headOrder = nullptr; 
 	Order* tailOrder = nullptr;

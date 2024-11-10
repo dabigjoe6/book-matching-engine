@@ -4,6 +4,6 @@
 
 using std::cout;
 
-Limit::Limit(int limitPrice) {
+Limit::Limit(int limitPrice, int stopPrice) {
 	cout << "Limit price: " << limitPrice << "\n";
 }

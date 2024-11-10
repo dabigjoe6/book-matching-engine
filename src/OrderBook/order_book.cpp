@@ -45,6 +45,10 @@ void OrderBook::marketOrderHelper(Limit* limit, Order& order) {
 		//TODO:  Since the volume of the Limit is greater than the number of shares
 		// We might need to partially feel some orders in the Limit
 		// Should we check for this in execute? 
+		//
+		// TODO: This logic below doesn't take into consideration that the loop is meant to
+		// include not just the current limit price, but every limit price that meetes the condition for
+		// buy/sell. i.e next lowestBuy or next highest Sell etc.
 		while (limit->getHeadOrder() != nullptr) {
 			limit->execute(limit->getHeadOrder(), order);
 		}
@@ -86,6 +90,23 @@ void OrderBook::addMarketOrder(Order& order) {
 	if (order.getShares() != 0) {
 		
 	}
+
+	executeStopOrders();
+}
+
+void OrderBook::addStopOrderAsMarketOrder(Limit* oppositeLimit, Order& order) {
+
+	// TODO: Confirm what happens when we can't fullfil the market order for the stop order
+	// Do we make the unfullfilled ones limit orders? Or do they become stop orders?
+	if (order.getBuyOrSell() && oppositeLimit != nullptr && order.getStopPrice() <= oppositeLimit->getLimitPrice()) {
+		marketOrderHelper(oppositeLimit, order);
+		return;
+	} else if (!order.getBuyOrSell() && oppositeLimit != nullptr && order.getStopPrice() >= oppositeLimit->getLimitPrice()) {
+		marketOrderHelper(oppositeLimit, order);
+		return;
+	}
+
+	return;
 }
 
 void OrderBook::addLimitOrder(Order& order) {
@@ -104,6 +125,30 @@ void OrderBook::addLimitOrder(Order& order) {
 		Limit* limit = limitMap[limitPrice];
 		limit->addOrder(&order);
 
+		return;
+	}
+
+	executeStopOrders();
+}
+
+void OrderBook::addStopOrder(Order& order) {
+	Limit* oppositeLimit = order.getBuyOrSell() ? this->getLowestSell() : this->getHighestBuy();
+	
+	addStopOrderAsMarketOrder(oppositeLimit, order);
+
+	if (order.getShares() != 0) {
+		int stopPrice = order.getStopPrice();
+		int limitPrice = order.getLimitPrice();
+
+		std::unordered_map<int, Limit*> stopMap = order.getBuyOrSell() ? stopBuyMap : stopSellMap;
+
+		if (stopMap.find(stopPrice) == stopMap.end()) {
+			insertStopLimitIntoAVLTree(stopPrice, limitPrice, order.getBuyOrSell());
+		}
+
+		Limit* stopLimit = stopMap[stopPrice];
+		stopLimit->addOrder(&order);	
+		
 		return;
 	}
 }
@@ -125,6 +170,26 @@ void OrderBook::insertLimitIntoAVLTree(int limitPrice, int buyOrSell) {
 
 	Limit* newLimit = _insert(tree, limitPrice);
 	limitMap.try_emplace(limitPrice, newLimit);
+}
+
+void OrderBook::insertStopLimitIntoAVLTree(int stopPrice, int limitPrice, int buyOrSell) {
+	Limit* tree = buyOrSell ? stopBuyTree : stopSellTree;
+	Limit* edge = buyOrSell ? lowestStopBuy : highestStopSell;
+
+	std::unordered_map<int, Limit*> stopMap = buyOrSell ? stopBuyMap : stopSellMap;
+
+	if (tree == nullptr) {
+		Limit* newStopLimit = new Limit(limitPrice, stopPrice);
+		tree = newStopLimit;
+		edge = tree;
+
+		stopMap.try_emplace(stopPrice, newStopLimit);
+
+		return;
+	}
+
+	Limit* newStopLimit = _insert(tree, stopPrice);
+	stopMap.try_emplace(stopPrice, newStopLimit);
 }
 
 Limit* OrderBook::_insert(Limit* root, int limitPrice) {
