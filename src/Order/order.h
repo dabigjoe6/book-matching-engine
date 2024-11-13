@@ -14,14 +14,16 @@ public:
 	int getBuyOrSell();
 
 private:
-	int shares;
-	int limitPrice;
-	int stopPrice;
+	int shares = 0;
+	int limitPrice = 0;
+	int stopPrice = 0;
 
 	int buyOrSell;
 
 	Order* nextOrder = nullptr;
 	Order* prevOrder = nullptr;
+
+	friend class Limit;
 };
 
 #endif

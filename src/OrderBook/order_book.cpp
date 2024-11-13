@@ -1,4 +1,3 @@
-#include <iostream>
 #include <algorithm>
 
 #include "order_book.h"
@@ -6,11 +5,7 @@
 #include "../Limit/limit.h"
 #include "../Order/order.h"
 
-using std::cout;
-
-OrderBook::OrderBook() {
-	cout << "Order book works" << "\n";
-}
+OrderBook::OrderBook() {}
 
 void OrderBook::addOrder(Order& newOrder) {
 	// market order
