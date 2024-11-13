@@ -26,14 +26,9 @@ void OrderBook::addOrder(Order& newOrder) {
 		addLimitOrder(newOrder);
 	}
 
-	// stop order
-	if (newOrder.getLimitPrice() == 0 && newOrder.getStopPrice() > 0) {
+	// stop order or stop limit order
+	if (newOrder.getStopPrice() > 0) {
 		addStopOrder(newOrder);
-	}
-	
-	// stop limit order
-	if (newOrder.getLimitPrice() > 0 && newOrder.getStopPrice() > 0) {
-		addStopLimitOrder(newOrder);
 	}
 }
 
@@ -121,15 +116,23 @@ void OrderBook::addMarketOrder(Order& order) {
 	executeStopOrders(order.getBuyOrSell());
 }
 
-void OrderBook::addStopOrderAsMarketOrder(Limit* edgeLimit, Order& order) {
+void OrderBook::addStopOrderAsMarketOrLimitOrder(Limit* edgeLimit, Order& order) {
 
 	// TODO: Confirm what happens when we can't fullfil the market order for the stop order
 	// Do we make the unfullfilled ones limit orders? Or do they become stop orders?
 	if (order.getBuyOrSell() && edgeLimit != nullptr && order.getStopPrice() <= edgeLimit->getLimitPrice()) {
-		marketOrderHelper(edgeLimit, order);
+		if (order.getLimitPrice() == 0) {
+			marketOrderHelper(edgeLimit, order);
+		} else {
+			addLimitOrder(order);	
+		}
 		return;
 	} else if (!order.getBuyOrSell() && edgeLimit != nullptr && order.getStopPrice() >= edgeLimit->getLimitPrice()) {
-		marketOrderHelper(edgeLimit, order);
+		if (order.getLimitPrice() == 0) {
+			marketOrderHelper(edgeLimit, order);
+		} else {
+			addLimitOrder(order);
+		}
 		return;
 	}
 
@@ -161,7 +164,7 @@ void OrderBook::addLimitOrder(Order& order) {
 void OrderBook::addStopOrder(Order& order) {
 	Limit* edgeLimit = order.getBuyOrSell() ? this->getLowestSell() : this->getHighestBuy();
 	
-	addStopOrderAsMarketOrder(edgeLimit, order);
+	addStopOrderAsMarketOrLimitOrder(edgeLimit, order);
 
 	if (order.getShares() != 0) {
 		int stopPrice = order.getStopPrice();
