@@ -13,14 +13,11 @@ void OrderBook::addOrder(Order& newOrder) {
 	// My assumption is if there's no limitPrice and stopPrice set we want to
 	// execute the order immediately
 	if (newOrder.getLimitPrice() == 0 && newOrder.getStopPrice() == 0) {
-		addMarketOrder(newOrder);		
-	}
-
+		addMarketOrder(newOrder);		}
 	// limit order
 	if (newOrder.getLimitPrice() > 0 && newOrder.getStopPrice() == 0) {
 		addLimitOrder(newOrder);
 	}
-
 	// stop order or stop limit order
 	if (newOrder.getStopPrice() > 0) {
 		addStopOrder(newOrder);
@@ -28,47 +25,29 @@ void OrderBook::addOrder(Order& newOrder) {
 }
 
 void OrderBook::marketOrderHelper(Limit* limit, Order& order) {
-	if (limit != nullptr && limit->getVolume() > order.getShares()) {
-		// TODO: Confirm if we need to check if there's a limit on the head Order before
-		// execution
+	// TODO: Confirm if we need to check if there's a limit on the head Order before
+	// execution
+
+	//TODO:  Since the volume of the Limit is greater than the number of shares
+	// We might need to partially feel some orders in the Limit
+	// Should we check for this in execute? 
+	//
+	// TODO: This logic below doesn't take into consideration that the loop is meant to
+	// include not just the current limit price, but every limit price that meetes the condition for
+	// buy/sell. i.e next lowestBuy or next highest Sell etc.
+	while (limit != nullptr && limit->getHeadOrder() != nullptr && order.getShares() != 0) {
+		limit->execute(limit->getHeadOrder(), order);
+	}
 	
-		//TODO:  Since the volume of the Limit is greater than the number of shares
-		// We might need to partially feel some orders in the Limit
-		// Should we check for this in execute? 
-		//
-		// TODO: This logic below doesn't take into consideration that the loop is meant to
-		// include not just the current limit price, but every limit price that meetes the condition for
-		// buy/sell. i.e next lowestBuy or next highest Sell etc.
-		while (limit->getHeadOrder() != nullptr) {
-			limit->execute(limit->getHeadOrder(), order);
-		}
-		
-		//TODO: If above comment on limit on head Order is true, we might need to
-		// check if there are still shares left to execute given, we might not execute 
-		// all at once
-		if (order.getShares() != 0) {
-			// TODO: Add to Limit Order?
-			// What will be the limit price? or do we just discard it? 
-		}
+	//TODO: If above comment on limit on head Order is true, we might need to
+	// check if there are still shares left to execute given, we might not execute 
+	// all at once
+	if (order.getShares() != 0) {
+		// TODO: Add to Limit Order?
+		// What will be the limit price? or do we just discard it? 
+	}
 
 		return;
-	}
-
-	if (limit != nullptr && limit->getVolume() <= order.getShares()) {
-		//TODO: Confirm if we need to check if there's a limit on the head Order before
-		// execution
-		
-		limit->execute(limit->getVolume(), order); // Since order is more than or equal to entire volume of limit. Execute entire volume at once. TODO: Confirm if this is correct i.e we don't need to check for the limit of each order in the limit list
-		
-		
-		//TODO: If above comment on limit on head Order is true, we might need to
-		// check if there are still shares left to execute given, we might not execute 
-		// all at once
-		if (order.getShares() != 0) {
-			// TODO: Add to Limit Order?
-			// What will be the limit price? or do we just discard it? 
-		}
-	}
 }
 
 void OrderBook::executeStopOrders(int buyOrSell) {
@@ -184,7 +163,7 @@ void OrderBook::insertLimitIntoAVLTree(int limitPrice, int buyOrSell) {
 	std::unordered_map<int, Limit*> limitMap = buyOrSell ? buyLimitMap : sellLimitMap;
 	
 	if (tree == nullptr) {
-		Limit* newLimit = new Limit(limitPrice);
+		Limit* newLimit = new Limit(this, limitPrice);
 		tree = newLimit;
 		edge = tree;
 		
@@ -204,7 +183,7 @@ void OrderBook::insertStopLimitIntoAVLTree(int stopPrice, int limitPrice, int bu
 	std::unordered_map<int, Limit*> stopMap = buyOrSell ? stopBuyMap : stopSellMap;
 
 	if (tree == nullptr) {
-		Limit* newStopLimit = new Limit(limitPrice, stopPrice);
+		Limit* newStopLimit = new Limit(this, limitPrice, stopPrice);
 		tree = newStopLimit;
 		edge = tree;
 
@@ -219,7 +198,7 @@ void OrderBook::insertStopLimitIntoAVLTree(int stopPrice, int limitPrice, int bu
 
 Limit* OrderBook::_insert(Limit* root, int limitPrice) {
 	if (root == nullptr) {
-		return new Limit(limitPrice);
+		return new Limit(this, limitPrice);
 	}
 
 	if (limitPrice < root->limitPrice) {
@@ -259,6 +238,31 @@ Limit* OrderBook::_insert(Limit* root, int limitPrice) {
 	}
 
 	return root;
+}
+
+void OrderBook::deleteLimitFromAVLTree(Limit* limit, int buyOrSell) {
+	Limit* tree = buyOrSell ? buyTree : sellTree;
+
+	std::unordered_map<int, Limit*> limitMap = buyOrSell ? buyLimitMap : sellLimitMap;
+
+	_delete(tree, limit->getLimitPrice());		
+
+	limitMap.erase(limit->getLimitPrice());
+	delete limit;
+}
+
+Limit* OrderBook::_delete(Limit* root, int limitPrice) {
+	if (root == nullptr) {
+		return root;
+	}
+
+	if (limitPrice < root->limitPrice) {
+		root->leftLimit = _delete(root->leftLimit, limitPrice);
+	} else if (limitPrice > root->limitPrice) {
+		root->rightLimit = _delete(root->rightLimit, limitPrice);
+	} else {
+		if ( // TODO: Contine from here
+
 }
 
 Limit* OrderBook::rotateLeft(Limit* node) {

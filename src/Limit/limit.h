@@ -2,11 +2,12 @@
 #define LIMIT_HPP
 
 class Order;
+class OrderBook;
 
 class Limit {
 
 public: 
-	Limit(int limitPrice, int stopPrice = 0);
+	Limit(OrderBook* orderBook, int limitPrice, int stopPrice = 0);
 
 	int getLimitPrice();
 	int getStopPrice();
@@ -14,14 +15,14 @@ public:
 	void addOrder(Order* order);
 
 	int getVolume();
-	void setVolume(int volume);
 
 	Order* getHeadOrder();
 	Order* getTailOrder();
 
 	void execute(Order* headOrder, Order& order);
-	void execute(int limitVolume, Order& order);
 private: 
+	OrderBook* orderBook;
+
 	int limitPrice;
 	int stopPrice;
 	

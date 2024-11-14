@@ -7,7 +7,7 @@ public:
 	Order(int shares, int buyOrSell, int limitPrice = 0, int stopPrice = 0);
 
 	int getShares();
-	void setShares();
+	void setShares(int shares);
 
 	int getLimitPrice();
 	int getStopPrice();
