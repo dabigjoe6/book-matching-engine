@@ -1,10 +1,13 @@
-#include <iostream>
 #include "order.h"
 
+Order::Order(int shares, int buyOrSell, int limitPrice, int stopPrice): shares(shares), buyOrSell(buyOrSell), limitPrice(limitPrice), stopPrice(stopPrice) {}
 
-using std::cout;
+int Order::getShares() { return shares; }
 
+void Order::setShares(int _shares) { shares = _shares; }
 
-Order::Order(int shares, int buyOrSell, int limitPrice, int stopPrice) {
-	cout << "Order works: " << shares << buyOrSell << limitPrice << "\n";
-}
+int Order::getLimitPrice() { return limitPrice; }
+
+int Order::getStopPrice() { return stopPrice; }
+
+int Order::getBuyOrSell() { return buyOrSell; }
