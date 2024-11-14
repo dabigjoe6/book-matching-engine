@@ -51,12 +51,16 @@ private:
 	void insertLimitIntoAVLTree(int limitPrice, int buyOrSell);
 	void insertStopLimitIntoAVLTree(int stopPrice, int limitPrice, int buyOrSell);
 
+	void updateBookEdgeOnInsert(Limit* newLimit, int buyOrSell);
+	void updateBookStopEdgeOnInsert(Limit* newLimit, int buyOrSell);
+
 	Limit* _insert(Limit* root, int limitPrice);
 	Limit* _delete(Limit* root, int limitPrice);
 
 	void updateHeight(Limit* root);
 	int getHeight(Limit* node);
 	int getBalance(Limit* node);
+	Limit* getMinValueNode(Limit* node);
 
 	Limit* rotateLeft(Limit* root);
 	Limit* rotateRight(Limit* root);

@@ -174,6 +174,23 @@ void OrderBook::insertLimitIntoAVLTree(int limitPrice, int buyOrSell) {
 
 	Limit* newLimit = _insert(tree, limitPrice);
 	limitMap.try_emplace(limitPrice, newLimit);
+	updateBookEdgeOnInsert(newLimit, buyOrSell);
+}
+
+void OrderBook::updateBookEdgeOnInsert(Limit* newLimit, int buyOrSell) {	
+	if (buyOrSell) {
+		if (highestBuy != nullptr && newLimit->getLimitPrice() > highestBuy->getLimitPrice()) {
+			highestBuy = newLimit;
+		} else if (highestBuy == nullptr) {
+			highestBuy = newLimit;
+		}
+	} else {
+		if (lowestSell != nullptr && newLimit->getLimitPrice() < lowestSell->getLimitPrice()) {
+			lowestSell = newLimit;
+		} else if (lowestSell == nullptr) {
+			lowestSell = newLimit;
+		}
+	}
 }
 
 void OrderBook::insertStopLimitIntoAVLTree(int stopPrice, int limitPrice, int buyOrSell) {
@@ -194,6 +211,24 @@ void OrderBook::insertStopLimitIntoAVLTree(int stopPrice, int limitPrice, int bu
 
 	Limit* newStopLimit = _insert(tree, stopPrice);
 	stopMap.try_emplace(stopPrice, newStopLimit);
+	updateBookStopEdgeOnInsert(newStopLimit, buyOrSell);
+}
+
+void OrderBook::updateBookStopEdgeOnInsert(Limit* newStopLimit, int buyOrSell) {
+	Limit* edge = buyOrSell ? lowestStopBuy : highestStopSell;
+	if (buyOrSell) {
+		if (lowestStopBuy != nullptr && newStopLimit->getStopPrice() < lowestStopBuy->getStopPrice()) {
+			lowestStopBuy = newStopLimit;
+		} else if (lowestStopBuy == nullptr) {
+			lowestStopBuy = newStopLimit;
+		}
+	} else {
+		if (highestStopSell != nullptr && newStopLimit->getStopPrice() > highestStopSell->getStopPrice()) {
+			highestStopSell = newStopLimit;
+		} else if (highestStopSell == nullptr) {
+			highestStopSell = newStopLimit;
+		}
+	}
 }
 
 Limit* OrderBook::_insert(Limit* root, int limitPrice) {
@@ -246,9 +281,9 @@ void OrderBook::deleteLimitFromAVLTree(Limit* limit, int buyOrSell) {
 	std::unordered_map<int, Limit*> limitMap = buyOrSell ? buyLimitMap : sellLimitMap;
 
 	_delete(tree, limit->getLimitPrice());		
-
 	limitMap.erase(limit->getLimitPrice());
-	delete limit;
+
+	
 }
 
 Limit* OrderBook::_delete(Limit* root, int limitPrice) {
@@ -261,8 +296,58 @@ Limit* OrderBook::_delete(Limit* root, int limitPrice) {
 	} else if (limitPrice > root->limitPrice) {
 		root->rightLimit = _delete(root->rightLimit, limitPrice);
 	} else {
-		if ( // TODO: Contine from here
+		if (root->leftLimit == nullptr) {
+			Limit* temp = root->rightLimit;
+			delete root;
+			return temp;
+		} else if (root->rightLimit == nullptr) {
+			Limit* temp = root->leftLimit;
+			delete root;
+			return temp;
+		}
 
+		Limit* temp = getMinValueNode(root->rightLimit);
+		root->limitPrice = temp->limitPrice;
+		root->rightLimit = _delete(root->rightLimit, temp->limitPrice);
+	}
+
+	if (root == nullptr) return root;
+
+	updateHeight(root);
+	int balance = getBalance(root);
+
+	// Left Left case
+	if (balance > 1 && getBalance(root->leftLimit) >= 0) {
+		return rotateRight(root);
+	}
+
+	// Left Right case
+	if (balance > 1 && getBalance(root->leftLimit) < 0) {
+		root->leftLimit = rotateLeft(root->leftLimit);
+		return rotateRight(root);
+	}
+
+	// Right Right case
+	if (balance < -1 && getBalance(root->rightLimit) <= 0) {
+		return rotateLeft(root);
+	}
+
+	// Right Left case
+	if (balance < -1 && getBalance(root->rightLimit) > 0) {
+		root->rightLimit = rotateRight(root);
+		return rotateLeft(root);
+	}
+
+	return root;
+}
+
+
+Limit* OrderBook::getMinValueNode(Limit* node) {
+	Limit* current = node;
+	while (current->leftLimit != nullptr) {
+		current = current->leftLimit;
+	}
+	return current;
 }
 
 Limit* OrderBook::rotateLeft(Limit* node) {
