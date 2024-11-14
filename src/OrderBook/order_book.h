@@ -53,6 +53,8 @@ private:
 
 	void updateBookEdgeOnInsert(Limit* newLimit, int buyOrSell);
 	void updateBookStopEdgeOnInsert(Limit* newLimit, int buyOrSell);
+	
+	void updateBookEdgeOnDelete(Limit* limit, int buyOrSell);
 
 	Limit* _insert(Limit* root, int limitPrice);
 	Limit* _delete(Limit* root, int limitPrice);

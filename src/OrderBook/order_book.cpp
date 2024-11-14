@@ -279,11 +279,24 @@ void OrderBook::deleteLimitFromAVLTree(Limit* limit, int buyOrSell) {
 	Limit* tree = buyOrSell ? buyTree : sellTree;
 
 	std::unordered_map<int, Limit*> limitMap = buyOrSell ? buyLimitMap : sellLimitMap;
-
+	
+	updateBookEdgeOnDelete(limit, buyOrSell);
 	_delete(tree, limit->getLimitPrice());		
 	limitMap.erase(limit->getLimitPrice());
+}
 
-	
+void OrderBook::updateBookEdgeOnDelete(Limit* limit, int buyOrSell) {
+	Limit* edge = buyOrSell ? highestBuy : lowestSell;
+
+	if (limit == edge) {
+		if (buyOrSell && limit->leftLimit != nullptr) {
+			highestBuy = limit->leftLimit;
+		} else if (!buyOrSell && limit->rightLimit != nullptr) {
+			lowestSell = limit->rightLimit;
+		} else {
+			edge = limit->parent;
+		}
+	}
 }
 
 Limit* OrderBook::_delete(Limit* root, int limitPrice) {
