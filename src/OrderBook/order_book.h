@@ -43,7 +43,7 @@ private:
 	void addLimitOrder(Order& order);
 	void addStopOrder(Order& order);
 
-	void marketOrderHelper(Limit* limit, Order& order);
+	int marketOrderHelper(Limit* limit, Order& order);
 	void addStopOrderAsMarketOrLimitOrder(Limit* edgeLimit, Order& order);
 
 	void executeStopOrders(int buyOrSell);

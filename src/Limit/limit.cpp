@@ -45,10 +45,11 @@ void Limit::execute(Order* headOrder, Order& order) {
 			headOrder->prevOrder = nullptr;
 
 			delete tempOrder;
-			return;
 		} else {
 			orderBook->deleteLimitFromAVLTree(this, !order.getBuyOrSell());
 		}
+
+		return;
 	}
 
 	this->volume -= order.getShares();

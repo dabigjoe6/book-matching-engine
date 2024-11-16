@@ -24,10 +24,7 @@ void OrderBook::addOrder(Order& newOrder) {
 	}
 }
 
-void OrderBook::marketOrderHelper(Limit* edge, Order& order) {
-	//TODO:  Since the volume of the Limit is greater than the number of shares
-	// We might need to partially feel some orders in the Limit
-	// Should we check for this in execute? 
+int OrderBook::marketOrderHelper(Limit* edge, Order& order) {
 	while (
 		((order.getLimitPrice() == 0 || (
 			(order.getBuyOrSell() && order.getLimitPrice() >= edge->getLimitPrice()) || 
@@ -39,15 +36,7 @@ void OrderBook::marketOrderHelper(Limit* edge, Order& order) {
 		edge->execute(edge->getHeadOrder(), order);
 	}
 	
-	//TODO: If above comment on limit on head Order is true, we might need to
-	// check if there are still shares left to execute given, we might not execute 
-	// all at once
-	if (order.getShares() != 0) {
-		// TODO: Add to Limit Order?
-		// What will be the limit price? or do we just discard it? 
-	}
-
-		return;
+	return order.getShares();
 }
 
 void OrderBook::executeStopOrders(int buyOrSell) {
@@ -55,7 +44,11 @@ void OrderBook::executeStopOrders(int buyOrSell) {
 		// TODO: COnfirm if predicate for making stop orders limit orders should be based on limit price or stop price
 		while (lowestStopBuy != nullptr && (lowestSell == nullptr || lowestStopBuy->getLimitPrice() <= lowestSell->getLimitPrice())) {
 			if (lowestStopBuy->getHeadOrder()->getLimitPrice() == 0) {
-				marketOrderHelper(lowestSell, *(lowestStopBuy->getHeadOrder()));
+				int shares = marketOrderHelper(lowestSell, *(lowestStopBuy->getHeadOrder()));
+				// TODO: Handle when shares != 0
+				if (shares != 0) {
+
+				}
 				//TODO: Update lowestStopBuy -> Delete entire limit or just remove/change head order and tail order
 			} else {
 				addLimitOrder(*(lowestStopBuy->getHeadOrder()));
@@ -66,7 +59,11 @@ void OrderBook::executeStopOrders(int buyOrSell) {
 	} else {
 		while (highestStopSell != nullptr && (highestBuy == nullptr || highestStopSell->getLimitPrice() >= highestBuy->getLimitPrice())) {
 			if (highestStopSell->getHeadOrder()->getLimitPrice() == 0) {
-				marketOrderHelper(highestBuy, *(highestStopSell->getHeadOrder()));
+				int shares = marketOrderHelper(highestBuy, *(highestStopSell->getHeadOrder()));
+				// TODO: Handle when shares not equal zero	
+				if (shares != 0) {
+
+				}
 				//TODO: Update lowestStopBuy -> Delete entire limit or just remove/change head order and tail order
 			} else {
 				addLimitOrder(*(highestStopSell->getHeadOrder()));
@@ -80,10 +77,10 @@ void OrderBook::executeStopOrders(int buyOrSell) {
 void OrderBook::addMarketOrder(Order& order) {
 	Limit* edgeLimit = order.getBuyOrSell() ? this->getLowestSell() : this->getHighestBuy();
 
-	marketOrderHelper(edgeLimit, order);
+	int shares = marketOrderHelper(edgeLimit, order);
 	
 	// TODO: Do we need to do anything with orders that weren't placed? i.e Add to Limit Order?
-	if (order.getShares() != 0) {
+	if (shares != 0) {
 		
 	}
 
@@ -96,14 +93,21 @@ void OrderBook::addStopOrderAsMarketOrLimitOrder(Limit* edgeLimit, Order& order)
 	// Do we make the unfullfilled ones limit orders? Or do they become stop orders?
 	if (order.getBuyOrSell() && edgeLimit != nullptr && order.getStopPrice() <= edgeLimit->getLimitPrice()) {
 		if (order.getLimitPrice() == 0) {
-			marketOrderHelper(edgeLimit, order);
+			int shares = marketOrderHelper(edgeLimit, order);
+			// TODO: Handle when shares != 0	
+			if (shares != 0) {
+			}
 		} else {
 			addLimitOrder(order);	
 		}
 		return;
 	} else if (!order.getBuyOrSell() && edgeLimit != nullptr && order.getStopPrice() >= edgeLimit->getLimitPrice()) {
 		if (order.getLimitPrice() == 0) {
-			marketOrderHelper(edgeLimit, order);
+			int shares = marketOrderHelper(edgeLimit, order);
+			// TODO: Handle when shares != 0	
+			if (shares != 0) {
+
+			}
 		} else {
 			addLimitOrder(order);
 		}
@@ -116,9 +120,9 @@ void OrderBook::addStopOrderAsMarketOrLimitOrder(Limit* edgeLimit, Order& order)
 void OrderBook::addLimitOrder(Order& order) {
 	Limit* edgeLimit = order.getBuyOrSell() ? this->getLowestSell() : this->getHighestBuy();
 
-	marketOrderHelper(edgeLimit, order);
+	int shares = marketOrderHelper(edgeLimit, order);
 
-	if (order.getShares() != 0) {
+	if (shares != 0) {
 		int limitPrice = order.getLimitPrice();
 		std::unordered_map<int, Limit*> limitMap = order.getBuyOrSell() ? buyLimitMap : sellLimitMap;
 
