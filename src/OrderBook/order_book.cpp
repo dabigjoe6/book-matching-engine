@@ -24,19 +24,19 @@ void OrderBook::addOrder(Order& newOrder) {
 	}
 }
 
-void OrderBook::marketOrderHelper(Limit* limit, Order& order) {
-	// TODO: Confirm if we need to check if there's a limit on the head Order before
-	// execution
-
+void OrderBook::marketOrderHelper(Limit* edge, Order& order) {
 	//TODO:  Since the volume of the Limit is greater than the number of shares
 	// We might need to partially feel some orders in the Limit
 	// Should we check for this in execute? 
-	//
-	// TODO: This logic below doesn't take into consideration that the loop is meant to
-	// include not just the current limit price, but every limit price that meetes the condition for
-	// buy/sell. i.e next lowestBuy or next highest Sell etc.
-	while (limit != nullptr && limit->getHeadOrder() != nullptr && order.getShares() != 0) {
-		limit->execute(limit->getHeadOrder(), order);
+	while (
+		((order.getLimitPrice() == 0 || (
+			(order.getBuyOrSell() && order.getLimitPrice() >= edge->getLimitPrice()) || 
+			(!order.getBuyOrSell() && order.getLimitPrice() <= edge->getLimitPrice()))
+		) && 		
+		(edge != nullptr && edge->getHeadOrder() != nullptr && order.getShares() != 0))
+	)
+	{
+		edge->execute(edge->getHeadOrder(), order);
 	}
 	
 	//TODO: If above comment on limit on head Order is true, we might need to
