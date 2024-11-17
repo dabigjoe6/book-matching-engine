@@ -13,6 +13,12 @@ public:
 	int getStopPrice();
 	int getBuyOrSell();
 
+	Order* getNextOrder();
+	Order* getPrevOrder();
+
+	void setNextOrder(Order* order);
+	void setPrevOrder(Order* order);
+
 private:
 	int shares = 0;
 	int limitPrice = 0;

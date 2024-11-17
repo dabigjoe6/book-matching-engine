@@ -19,6 +19,7 @@ public:
 	Limit* getLowestStopBuy();
 
 	void deleteLimitFromAVLTree(Limit* limit, int buyOrSell);
+	void deleteStopLimitFromAVLTree(Limit* limit, int buyOrSell);
 
 private:
 	Limit* buyTree = nullptr;
@@ -55,9 +56,13 @@ private:
 	void updateBookStopEdgeOnInsert(Limit* newLimit, int buyOrSell);
 	
 	void updateBookEdgeOnDelete(Limit* limit, int buyOrSell);
+	void updateBookStopEdgeOnDelete(Limit* limit, int buyOrSell);
 
 	Limit* _insert(Limit* root, int limitPrice);
+	Limit* _insert(Limit* root, int stopPrice, int limitPrice);
+
 	Limit* _delete(Limit* root, int limitPrice);
+	Limit* _stopDelete(Limit* root, int stopPrice);
 
 	void updateHeight(Limit* root);
 	int getHeight(Limit* node);
