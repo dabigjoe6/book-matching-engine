@@ -71,34 +71,16 @@ void OrderBook::addMarketOrder(Order& order) {
 	executeStopOrders(order.getBuyOrSell());
 }
 
-void OrderBook::addStopOrderAsMarketOrLimitOrder(Limit* edgeLimit, Order& order) {
-
-	// TODO: Confirm what happens when we can't fullfil the market order for the stop order
-	// Do we make the unfullfilled ones limit orders? Or do they become stop orders?
-	if (order.getBuyOrSell() && edgeLimit != nullptr && order.getStopPrice() <= edgeLimit->getLimitPrice()) {
-		if (order.getLimitPrice() == 0) {
-			int shares = marketOrderHelper(edgeLimit, order);
-			// TODO: Handle when shares != 0	
-			if (shares != 0) {
-			}
-		} else {
-			addLimitOrder(order);	
-		}
-		return;
-	} else if (!order.getBuyOrSell() && edgeLimit != nullptr && order.getStopPrice() >= edgeLimit->getLimitPrice()) {
-		if (order.getLimitPrice() == 0) {
-			int shares = marketOrderHelper(edgeLimit, order);
-			// TODO: Handle when shares != 0	
-			if (shares != 0) {
-
-			}
-		} else {
-			addLimitOrder(order);
-		}
-		return;
+bool OrderBook::addStopOrderAsMarketOrLimitOrder(Limit* edgeLimit, Order& order) {
+	if (order.getBuyOrSell() && (edgeLimit == nullptr || (edgeLimit != nullptr && order.getStopPrice() >= edgeLimit->getLimitPrice()))) {
+		addLimitOrder(order);
+		return true;
+	} else if (!order.getBuyOrSell() && (edgeLimit == nullptr || (edgeLimit != nullptr && order.getStopPrice() <= edgeLimit->getLimitPrice()))) {
+		addLimitOrder(order);
+		return true;
 	}
 
-	return;
+	return false;
 }
 
 void OrderBook::addLimitOrder(Order& order) {
@@ -126,9 +108,7 @@ void OrderBook::addLimitOrder(Order& order) {
 void OrderBook::addStopOrder(Order& order) {
 	Limit* edgeLimit = order.getBuyOrSell() ? this->getLowestSell() : this->getHighestBuy();
 	
-	addStopOrderAsMarketOrLimitOrder(edgeLimit, order);
-
-	if (order.getShares() != 0) {
+	if (!addStopOrderAsMarketOrLimitOrder(edgeLimit, order)) {
 		int stopPrice = order.getStopPrice();
 		int limitPrice = order.getLimitPrice();
 
@@ -140,8 +120,6 @@ void OrderBook::addStopOrder(Order& order) {
 
 		Limit* stopLimit = stopMap[stopPrice];
 		stopLimit->addOrder(&order);	
-		
-		return;
 	}
 }
 
