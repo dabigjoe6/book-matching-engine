@@ -66,7 +66,7 @@ void OrderBook::addMarketOrder(Order& order) {
 	Limit* edgeLimit = order.getBuyOrSell() ? this->getLowestSell() : this->getHighestBuy();
 	
 	// If we the order is partially filled or there's no existing order to match against, we forget the order
-	int shares = marketOrderHelper(edgeLimit, order);
+	marketOrderHelper(edgeLimit, order);
 	
 	executeStopOrders(order.getBuyOrSell());
 }

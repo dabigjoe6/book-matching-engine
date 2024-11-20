@@ -47,8 +47,9 @@ void Limit::execute(Order* headOrder, Order& order) {
 			delete tempOrder;
 		} else {
 			orderBook->deleteLimitFromAVLTree(this, !order.getBuyOrSell());
+			delete headOrder;
+			delete tempOrder;
 		}
-
 		return;
 	}
 
