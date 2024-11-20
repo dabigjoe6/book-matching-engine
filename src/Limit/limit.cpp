@@ -13,7 +13,6 @@ int Limit::getStopPrice() { return stopPrice; }
 void Limit::addOrder(Order* order) {
 	if (order == nullptr) {
 		throw std::invalid_argument("Order can not be a nullptr");
-
 	}
 
 	if (headOrder == nullptr) {
@@ -24,7 +23,7 @@ void Limit::addOrder(Order* order) {
 		tailOrder = order;
 	}
 
-	volume += order->getShares(); // TODO: Confirm this is the correct representation of limit volume
+	volume += order->getShares();
 }
 
 int Limit::getVolume() { return volume; }
@@ -32,8 +31,6 @@ int Limit::getVolume() { return volume; }
 Order* Limit::getHeadOrder() { return headOrder; }
 Order* Limit::getTailOrder() { return tailOrder; }
 
-
-//TODO: Confirm cleanup of order
 void Limit::execute(Order* headOrder, Order& order) {
 	if (headOrder->getShares() <= order.getShares()) {
 		this->volume -= headOrder->getShares();
