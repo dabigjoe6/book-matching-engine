@@ -5,6 +5,7 @@
 
 class Limit;
 class Order;
+class OrderGenerator;
 
 class OrderBook {
 public:
@@ -44,6 +45,9 @@ private:
 	void addLimitOrder(Order& order);
 	void addStopOrder(Order& order);
 
+	void queueOrderInLimit(Order& order);
+	void queueStopOrderInLimit(Order& order);
+
 	int marketOrderHelper(Limit* limit, Order& order);
 	bool addStopOrderAsMarketOrLimitOrder(Limit* edgeLimit, Order& order);
 
@@ -71,6 +75,8 @@ private:
 
 	Limit* rotateLeft(Limit* root);
 	Limit* rotateRight(Limit* root);
+
+	friend OrderGenerator;
 };
 
 #endif

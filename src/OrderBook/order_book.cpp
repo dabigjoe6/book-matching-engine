@@ -89,38 +89,44 @@ void OrderBook::addLimitOrder(Order& order) {
 	int shares = marketOrderHelper(edgeLimit, order);
 
 	if (shares != 0) {
-		int limitPrice = order.getLimitPrice();
-		std::unordered_map<int, Limit*> limitMap = order.getBuyOrSell() ? buyLimitMap : sellLimitMap;
-
-		if (limitMap.find(limitPrice) == limitMap.end()) {
-			insertLimitIntoAVLTree(limitPrice, order.getBuyOrSell());
-		}
-
-		Limit* limit = limitMap[limitPrice];
-		limit->addOrder(&order);
-
-		return;
+		queueOrderInLimit(order);
 	}
 
 	executeStopOrders(order.getBuyOrSell());
+}
+
+void OrderBook::queueOrderInLimit(Order& order) {
+	int limitPrice = order.getLimitPrice();
+	std::unordered_map<int, Limit*> limitMap = order.getBuyOrSell() ? buyLimitMap : sellLimitMap;
+
+	if (limitMap.find(limitPrice) == limitMap.end()) {
+		insertLimitIntoAVLTree(limitPrice, order.getBuyOrSell());
+	}
+
+	Limit* limit = limitMap[limitPrice];
+	limit->addOrder(&order);
 }
 
 void OrderBook::addStopOrder(Order& order) {
 	Limit* edgeLimit = order.getBuyOrSell() ? this->getLowestSell() : this->getHighestBuy();
 	
 	if (!addStopOrderAsMarketOrLimitOrder(edgeLimit, order)) {
-		int stopPrice = order.getStopPrice();
-		int limitPrice = order.getLimitPrice();
-
-		std::unordered_map<int, Limit*> stopMap = order.getBuyOrSell() ? stopBuyMap : stopSellMap;
-
-		if (stopMap.find(stopPrice) == stopMap.end()) {
-			insertStopLimitIntoAVLTree(stopPrice, limitPrice, order.getBuyOrSell());
-		}
-
-		Limit* stopLimit = stopMap[stopPrice];
-		stopLimit->addOrder(&order);	
+		queueStopOrderInLimit(order);
 	}
+}
+
+void OrderBook::queueStopOrderInLimit(Order& order) {
+	int stopPrice = order.getStopPrice();
+	int limitPrice = order.getLimitPrice();
+
+	std::unordered_map<int, Limit*> stopMap = order.getBuyOrSell() ? stopBuyMap : stopSellMap;
+
+	if (stopMap.find(stopPrice) == stopMap.end()) {
+		insertStopLimitIntoAVLTree(stopPrice, limitPrice, order.getBuyOrSell());
+	}
+
+	Limit* stopLimit = stopMap[stopPrice];
+	stopLimit->addOrder(&order);	
 }
 
 void OrderBook::insertLimitIntoAVLTree(int limitPrice, int buyOrSell) {
