@@ -1,21 +1,25 @@
 #ifndef ORDER_GENERATOR_H
 #define ORDER_GENERATOR_H
 
-#include "tuple"
 #include <random>
+#include <tuple>
+#include <fstream>
 
 class OrderBook;
 
 class OrderGenerator {
 public:
 	OrderGenerator(OrderBook* orderBook);
+	~OrderGenerator();
 
-	void generateOrders(int noOfOrders);
+	void generateInitialOrders(int noOfOrders);
 private:
 	OrderBook* orderBook;
 
 	std::random_device rd;	
 	std::mt19937 gen;
+
+	std::fstream file;	
 
 	std::tuple<int, int> sharesRange = {0, 1000};
 	std::tuple<int, int> limitPriceRange = {50, 250};

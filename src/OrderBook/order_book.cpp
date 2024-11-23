@@ -165,6 +165,12 @@ void OrderBook::updateBookEdgeOnInsert(Limit* newLimit, int buyOrSell) {
 	}
 }
 
+Limit* OrderBook::getHighestBuy() { return highestBuy; }
+Limit* OrderBook::getLowestSell() { return lowestSell; }
+
+Limit* OrderBook::getLowestStopBuy() { return lowestStopBuy; }
+Limit* OrderBook::getHighestStopSell() { return highestStopSell; }
+
 void OrderBook::insertStopLimitIntoAVLTree(int stopPrice, int limitPrice, int buyOrSell) {
 	Limit* tree = buyOrSell ? stopBuyTree : stopSellTree;
 	Limit* edge = buyOrSell ? lowestStopBuy : highestStopSell;

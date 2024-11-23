@@ -214,6 +214,30 @@ src/OrderBook/order_book.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/LimitOrderBook_lib.dir/build.make CMakeFiles/LimitOrderBook_lib.dir/src/OrderBook/order_book.cpp.s
 .PHONY : src/OrderBook/order_book.cpp.s
 
+src/OrderGenerator/order_generator.o: src/OrderGenerator/order_generator.cpp.o
+.PHONY : src/OrderGenerator/order_generator.o
+
+# target to build an object file
+src/OrderGenerator/order_generator.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LimitOrderBook_lib.dir/build.make CMakeFiles/LimitOrderBook_lib.dir/src/OrderGenerator/order_generator.cpp.o
+.PHONY : src/OrderGenerator/order_generator.cpp.o
+
+src/OrderGenerator/order_generator.i: src/OrderGenerator/order_generator.cpp.i
+.PHONY : src/OrderGenerator/order_generator.i
+
+# target to preprocess a source file
+src/OrderGenerator/order_generator.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LimitOrderBook_lib.dir/build.make CMakeFiles/LimitOrderBook_lib.dir/src/OrderGenerator/order_generator.cpp.i
+.PHONY : src/OrderGenerator/order_generator.cpp.i
+
+src/OrderGenerator/order_generator.s: src/OrderGenerator/order_generator.cpp.s
+.PHONY : src/OrderGenerator/order_generator.s
+
+# target to generate assembly for a file
+src/OrderGenerator/order_generator.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LimitOrderBook_lib.dir/build.make CMakeFiles/LimitOrderBook_lib.dir/src/OrderGenerator/order_generator.cpp.s
+.PHONY : src/OrderGenerator/order_generator.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -257,6 +281,9 @@ help:
 	@echo "... src/OrderBook/order_book.o"
 	@echo "... src/OrderBook/order_book.i"
 	@echo "... src/OrderBook/order_book.s"
+	@echo "... src/OrderGenerator/order_generator.o"
+	@echo "... src/OrderGenerator/order_generator.i"
+	@echo "... src/OrderGenerator/order_generator.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

@@ -5,18 +5,20 @@ set(PROJECT_NAME LimitOrderBook)
 project(LimitOrderBook VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 
 set(Headers
 	./src/Order/order.h
 	./src/Limit/limit.h
 	./src/OrderBook/order_book.h
+	./src/OrderGenerator/order_generator.h
 )
 
 set(Sources
 	./src/Order/order.cpp
 	./src/Limit/limit.cpp
 	./src/OrderBook/order_book.cpp
+	./src/OrderGenerator/order_generator.cpp
 )
 
 # Define the library target
