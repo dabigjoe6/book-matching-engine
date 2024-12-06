@@ -35,11 +35,11 @@ private:
 	Limit* highestStopSell;
 	Limit* lowestStopBuy;
 
-	std::unordered_map<int, Limit*> buyLimitMap;
-	std::unordered_map<int, Limit*> sellLimitMap;
+	std::unordered_map<int, Limit*>* buyLimitMap;
+	std::unordered_map<int, Limit*>* sellLimitMap;
 
-	std::unordered_map<int, Limit*> stopBuyMap;
-	std::unordered_map<int, Limit*> stopSellMap;
+	std::unordered_map<int, Limit*>* stopBuyMap;
+	std::unordered_map<int, Limit*>* stopSellMap;
 
 	void addMarketOrder(Order& order);
 	void addLimitOrder(Order& order);
@@ -53,27 +53,30 @@ private:
 
 	void executeStopOrders(int buyOrSell);
 
-	void insertLimitIntoAVLTree(int limitPrice, int buyOrSell);
-	void insertStopLimitIntoAVLTree(int stopPrice, int limitPrice, int buyOrSell);
+	void insertLimitIntoAVLTree(const int limitPrice, const int buyOrSell);
+	void insertStopLimitIntoAVLTree(const int stopPrice, const int limitPrice, const int buyOrSell);
 
-	void updateBookEdgeOnInsert(Limit* newLimit, int buyOrSell);
-	void updateBookStopEdgeOnInsert(Limit* newLimit, int buyOrSell);
+	void updateBookEdgeOnInsert(Limit* newLimit, const int buyOrSell);
+	void updateBookStopEdgeOnInsert(Limit* newLimit, const int buyOrSell);
 	
-	void updateBookEdgeOnDelete(Limit* limit, int buyOrSell);
-	void updateBookStopEdgeOnDelete(Limit* limit, int buyOrSell);
+	void updateBookEdgeOnDelete(Limit* limit, const int buyOrSell);
+	void updateBookStopEdgeOnDelete(Limit* limit, const int buyOrSell);
 
-	Limit* _insert(Limit* root, int limitPrice);
-	Limit* _insert(Limit* root, int stopPrice, int limitPrice);
+	Limit* _insert(Limit* root, const int limitPrice);
+	Limit* _insert(Limit* root, const int stopPrice, const int limitPrice);
 
-	Limit* _delete(Limit* root, int limitPrice);
-	Limit* _stopDelete(Limit* root, int stopPrice);
+	Limit* _delete(Limit* root, const int limitPrice);
+	Limit* _stopDelete(Limit* root, const int stopPrice);
 
 	void updateHeight(Limit* root);
-	int getHeight(Limit* node);
-	int getBalance(Limit* node);
+
+	int getHeight(const Limit* node);
+	int getBalance(const Limit* node);
+
 	Limit* getMinValueNode(Limit* node);
 
 	Limit* rotateLeft(Limit* root);
+
 	Limit* rotateRight(Limit* root);
 
 	friend OrderGenerator;

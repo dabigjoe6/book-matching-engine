@@ -19,7 +19,7 @@ private:
 	std::random_device rd;	
 	std::mt19937 gen;
 
-	std::fstream file;	
+	std::ofstream file;	
 
 	std::tuple<int, int> sharesRange = {0, 1000};
 	std::tuple<int, int> limitPriceRange = {50, 250};

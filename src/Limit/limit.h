@@ -9,15 +9,15 @@ class Limit {
 public: 
 	Limit(OrderBook* orderBook, int limitPrice, int stopPrice = 0);
 
-	int getLimitPrice();
-	int getStopPrice();
+	int getLimitPrice() const;
+	int getStopPrice() const;
 
 	void addOrder(Order* order);
 
-	int getVolume();
+	int getVolume() const;
 
-	Order* getHeadOrder();
-	Order* getTailOrder();
+	Order* getHeadOrder() const;
+	Order* getTailOrder() const;
 
 	void execute(Order* headOrder, Order& order);
 private: 

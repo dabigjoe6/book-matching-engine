@@ -6,12 +6,12 @@ class Order {
 public:
 	Order(int shares, int buyOrSell, int limitPrice = 0, int stopPrice = 0);
 
-	int getShares();
+	int getShares() const;
 	void setShares(int shares);
 
-	int getLimitPrice();
-	int getStopPrice();
-	int getBuyOrSell();
+	int getLimitPrice() const;
+	int getStopPrice() const;
+	int getBuyOrSell() const;
 
 	Order* getNextOrder();
 	Order* getPrevOrder();

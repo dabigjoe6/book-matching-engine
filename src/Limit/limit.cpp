@@ -6,9 +6,9 @@
 Limit::Limit(OrderBook* orderBook, int limitPrice, int stopPrice): orderBook(orderBook), limitPrice(limitPrice), stopPrice(stopPrice) {
 }
 
-int Limit::getLimitPrice() { return limitPrice; }
+int Limit::getLimitPrice() const { return limitPrice; }
 
-int Limit::getStopPrice() { return stopPrice; }
+int Limit::getStopPrice() const { return stopPrice; }
 
 void Limit::addOrder(Order* order) {
 	if (order == nullptr) {
@@ -26,10 +26,11 @@ void Limit::addOrder(Order* order) {
 	volume += order->getShares();
 }
 
-int Limit::getVolume() { return volume; }
+int Limit::getVolume() const { return volume; }
 
-Order* Limit::getHeadOrder() { return headOrder; }
-Order* Limit::getTailOrder() { return tailOrder; }
+Order* Limit::getHeadOrder() const { return headOrder; }
+
+Order* Limit::getTailOrder() const { return tailOrder; }
 
 void Limit::execute(Order* headOrder, Order& order) {
 	if (headOrder->getShares() <= order.getShares()) {
