@@ -4,15 +4,24 @@
 #include <random>
 #include <tuple>
 #include <fstream>
+#include <string>
 
 class OrderBook;
+class Order;
 
 class OrderGenerator {
 public:
 	OrderGenerator(OrderBook* orderBook);
 	~OrderGenerator();
 
+	void openFile(std::string filePathString = "inital_orders.txt");
+
 	void generateInitialOrders(int noOfOrders);
+	void generateOrders(int noOfOrders);
+	void simulateMarket();
+
+	Order* generateOrder();
+
 private:
 	OrderBook* orderBook;
 

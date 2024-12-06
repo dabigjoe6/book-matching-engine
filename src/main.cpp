@@ -11,4 +11,6 @@ int main(int argc, char** argv) {
 	OrderGenerator generator = OrderGenerator(&order_book);
 
 	generator.generateInitialOrders(4);
+	generator.generateOrders(10);
+	generator.simulateMarket();
 }
