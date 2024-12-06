@@ -35,11 +35,17 @@ private:
 	Limit* highestStopSell;
 	Limit* lowestStopBuy;
 
-	std::unordered_map<int, Limit*>* buyLimitMap;
-	std::unordered_map<int, Limit*>* sellLimitMap;
+	std::unordered_map<int, Limit*> _buyLimitMap = {};
+	std::unordered_map<int, Limit*>* buyLimitMap = &_buyLimitMap;
 
-	std::unordered_map<int, Limit*>* stopBuyMap;
-	std::unordered_map<int, Limit*>* stopSellMap;
+	std::unordered_map<int, Limit*> _sellLimitMap = {};
+	std::unordered_map<int, Limit*>* sellLimitMap = &_sellLimitMap;
+
+	std::unordered_map<int, Limit*> _stopBuyMap = {};	
+	std::unordered_map<int, Limit*>* stopBuyMap = &_stopBuyMap;
+
+	std::unordered_map<int, Limit*> _stopSellMap = {};	
+	std::unordered_map<int, Limit*>* stopSellMap = &_stopSellMap;
 
 	void addMarketOrder(Order& order);
 	void addLimitOrder(Order& order);
