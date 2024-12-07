@@ -2,6 +2,8 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <vector>
 
 #include "order_generator.h"
 #include "../OrderBook/order_book.h"
@@ -10,7 +12,11 @@
 namespace fs = std::filesystem;
 
 OrderGenerator::OrderGenerator(OrderBook* orderBook): orderBook(orderBook), gen(rd()) {
-	openFile();
+	try {
+		openFile();
+	} catch (const std::exception& e) {
+		std::cerr << "Exception caught: " << e.what() << std::endl;
+	}
 }
 
 OrderGenerator::~OrderGenerator() {
@@ -25,7 +31,7 @@ void OrderGenerator::openFile(std::string filePathString) {
 	file.open(filePath);
 
 	if (!file.is_open()) {
-		std::cerr << "Could not open file for writing!" << std::endl;	
+		throw std::runtime_error("Failed to open file");
 	}
 }
 
@@ -43,6 +49,13 @@ void OrderGenerator::generateInitialOrders(int noOfOrders) {
 }
 
 void OrderGenerator::generateOrders(int noOfOrders) {
+	try {
+		openFile("orders.txt");
+	} catch (const std::exception& e) {
+		std::cerr << "Exception caught: " << e.what() << std::endl;
+		return;
+	}
+
 	for (int i = 0; i < noOfOrders; ++i) {
 		Order* newOrder = generateOrder();
 		file << "Order " << newOrder->getShares() << "\t" << newOrder->getBuyOrSell() << "\t" << newOrder->getLimitPrice() << "\t" << newOrder->getStopPrice() << "\n"; 	
@@ -70,6 +83,48 @@ Order* OrderGenerator::generateOrder() {
 }
 
 void OrderGenerator::simulateMarket() {
+	// read and parse orders from orders.txt
+	processOrders(readOrders());	
+}
 
+void OrderGenerator::processOrders(std::vector<Order*> readOrders) {
+	for (Order* order : readOrders) {
+		orderBook->addOrder(*order);
+	}
+}
+
+std::vector<Order*> OrderGenerator::readOrders() {
+	std::ifstream inputFile("orders.txt");
+	if (!inputFile.is_open()) {
+		std::cerr << "Could not read orders" << std::endl;
+		return {};
+	}
+
+	std::vector<Order* > readOrders;
+
+	std::string line;
+	while (std::getline(inputFile, line)) {
+		std::istringstream iss(line);
+		
+		std::string orderId; // For now it is just 'Order'
+		iss >> orderId;
+
+		int shares;
+		iss >> shares;
+
+		int buyOrSell;
+		iss >> buyOrSell;
+
+		int limitPrice;
+		iss >> limitPrice;
+
+		int stopPrice;
+		iss >> stopPrice;
+	
+		Order* readOrder = new Order(shares, buyOrSell, limitPrice, stopPrice);
+		readOrders.push_back(readOrder);	
+	}
+
+	return readOrders;
 }
 

@@ -5,6 +5,7 @@
 #include <tuple>
 #include <fstream>
 #include <string>
+#include <vector>
 
 class OrderBook;
 class Order;
@@ -20,7 +21,6 @@ public:
 	void generateOrders(int noOfOrders);
 	void simulateMarket();
 
-	Order* generateOrder();
 
 private:
 	OrderBook* orderBook;
@@ -33,6 +33,11 @@ private:
 	std::tuple<int, int> sharesRange = {0, 1000};
 	std::tuple<int, int> limitPriceRange = {50, 250};
 	std::tuple<int, int> stopPriceRange = {50, 250};
+
+
+	Order* generateOrder();
+	std::vector<Order*> readOrders();
+	void processOrders(std::vector<Order*> readOrders);
 };
 
 #endif
