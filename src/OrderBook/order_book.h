@@ -51,8 +51,8 @@ private:
 	void addLimitOrder(Order& order);
 	void addStopOrder(Order& order);
 
-	void queueOrderInLimit(Order& order);
-	void queueStopOrderInLimit(Order& order);
+	void addLimitOrderToLimitQueue(Order& order);
+	void addStopOrderToStopQueue(Order& order);
 
 	int marketOrderHelper(Limit* limit, Order& order);
 	bool addStopOrderAsMarketOrLimitOrder(Limit* edgeLimit, Order& order);

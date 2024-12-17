@@ -13,7 +13,7 @@ namespace fs = std::filesystem;
 
 OrderGenerator::OrderGenerator(OrderBook* orderBook): orderBook(orderBook), gen(rd()) {
 	try {
-		openFile();
+		openFile("initial_orders.txt");
 	} catch (const std::exception& e) {
 		std::cerr << "Exception caught: " << e.what() << std::endl;
 	}
@@ -27,6 +27,7 @@ OrderGenerator::~OrderGenerator() {
 }
 
 void OrderGenerator::openFile(std::string filePathString) {
+	file.close();
 	fs::path filePath = fs::current_path() / filePathString;
 	file.open(filePath);
 
@@ -39,9 +40,9 @@ void OrderGenerator::generateInitialOrders(int noOfOrders) {
 	for (int i = 0; i < noOfOrders; ++i) {
 		Order* newOrder = generateOrder();
 		if (newOrder->getStopPrice() == 0) {
-			orderBook->queueOrderInLimit(*newOrder);
+			orderBook->addLimitOrderToLimitQueue(*newOrder);
 		} else {
-			orderBook->queueStopOrderInLimit(*newOrder);
+			orderBook->addStopOrderToStopQueue(*newOrder);
 		}
 
 		file << "Order " << newOrder->getShares() << "\t" << newOrder->getBuyOrSell() << "\t" << newOrder->getLimitPrice() << "\t" << newOrder->getStopPrice() << "\n"; 

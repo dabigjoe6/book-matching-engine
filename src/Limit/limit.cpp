@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <iostream>
 #include "limit.h"
 #include "../Order/order.h"
 #include "../OrderBook/order_book.h"
@@ -34,8 +35,12 @@ Order* Limit::getTailOrder() const { return tailOrder; }
 
 void Limit::execute(Order* headOrder, Order& order) {
 	if (headOrder->getShares() <= order.getShares()) {
+		int filledShares = headOrder->getShares();
+
 		this->volume -= headOrder->getShares();
-		order.setShares(order.getShares() - headOrder->getShares());	
+		order.setShares(order.getShares() - headOrder->getShares());
+		
+		std::cout << (order.getBuyOrSell() ? "Buy" : "Sell") << " " << (order.getShares() == 0 ? "[FILL]" : "[PARTIAL FILL]") << " for " << filledShares << " @ " << headOrder->getLimitPrice() << "\n";
 
 		Order* tempOrder = headOrder;
 		headOrder = headOrder->nextOrder;
@@ -50,8 +55,10 @@ void Limit::execute(Order* headOrder, Order& order) {
 		}
 		return;
 	}
-
+	int filledShares = order.getShares();
 	this->volume -= order.getShares();
 	headOrder->setShares(headOrder->getShares() - order.getShares());
+
+	std::cout << (order.getBuyOrSell() ? "Buy" : "Sell") << " [FILL]" << " for " << filledShares << " @ " << headOrder->getLimitPrice() << "\n";
 	return;
 }
