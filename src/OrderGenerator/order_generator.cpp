@@ -54,12 +54,13 @@ void OrderGenerator::generateOrders(int noOfOrders) {
 		openFile("orders.txt");
 	} catch (const std::exception& e) {
 		std::cerr << "Exception caught: " << e.what() << std::endl;
+		file.clear();
 		return;
 	}
 
 	for (int i = 0; i < noOfOrders; ++i) {
 		Order* newOrder = generateOrder();
-		file << "Order " << newOrder->getShares() << "\t" << newOrder->getBuyOrSell() << "\t" << newOrder->getLimitPrice() << "\t" << newOrder->getStopPrice() << "\n"; 	
+		file << "Order " << newOrder->getShares() << "\t" << newOrder->getBuyOrSell() << "\t" << newOrder->getLimitPrice() << "\t" << newOrder->getStopPrice() << "\n" << std::flush; 	
 	}
 }
 
@@ -95,7 +96,7 @@ void OrderGenerator::processOrders(std::vector<Order*> readOrders) {
 }
 
 std::vector<Order*> OrderGenerator::readOrders() {
-	std::ifstream inputFile("orders.txt");
+	std::ifstream inputFile(fs::current_path() / "orders.txt");
 	if (!inputFile.is_open()) {
 		std::cerr << "Could not read orders" << std::endl;
 		return {};
@@ -104,8 +105,11 @@ std::vector<Order*> OrderGenerator::readOrders() {
 	std::vector<Order* > readOrders;
 
 	std::string line;
+	int i_ran_at_least_once = 0;
 	while (std::getline(inputFile, line)) {
 		std::istringstream iss(line);
+
+		i_ran_at_least_once += 1;
 		
 		std::string orderId; // For now it is just 'Order'
 		iss >> orderId;
