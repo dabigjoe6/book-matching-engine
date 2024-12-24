@@ -1,64 +1,70 @@
-#include <stdexcept>
+#include <iomanip>
 #include <iostream>
-#include "limit.h"
+#include <stdexcept>
+
 #include "../Order/order.h"
 #include "../OrderBook/order_book.h"
+#include "limit.h"
 
-Limit::Limit(OrderBook* orderBook, int limitPrice, int stopPrice): orderBook(orderBook), limitPrice(limitPrice), stopPrice(stopPrice) {
-}
+Limit::Limit(OrderBook *orderBook, int limitPrice, int stopPrice)
+    : orderBook(orderBook), limitPrice(limitPrice), stopPrice(stopPrice) {}
 
 int Limit::getLimitPrice() const { return limitPrice; }
 
 int Limit::getStopPrice() const { return stopPrice; }
 
-void Limit::addOrder(Order* order) {
-	if (order == nullptr) {
-		throw std::invalid_argument("Order can not be a nullptr");
-	}
+void Limit::addOrder(Order *order) {
+  if (order == nullptr) {
+    throw std::invalid_argument("Order can not be a nullptr");
+  }
 
-	if (headOrder == nullptr) {
-		headOrder = tailOrder = order;
-	} else {
-		tailOrder->nextOrder = order;
-		order->prevOrder = tailOrder;
-		tailOrder = order;
-	}
+  if (headOrder == nullptr) {
+    headOrder = tailOrder = order;
+  } else {
+    tailOrder->nextOrder = order;
+    order->prevOrder = tailOrder;
+    tailOrder = order;
+  }
 
-	volume += order->getShares();
+  volume += order->getShares();
 }
 
 int Limit::getVolume() const { return volume; }
 
-Order* Limit::getHeadOrder() const { return headOrder; }
+Order *Limit::getHeadOrder() const { return headOrder; }
+Order *Limit::getTailOrder() const { return tailOrder; }
 
-Order* Limit::getTailOrder() const { return tailOrder; }
+void Limit::execute(Order *headOrder, Order &order) {
+  if (headOrder->getShares() <= order.getShares()) {
+    int filledShares = headOrder->getShares();
 
-void Limit::execute(Order* headOrder, Order& order) {
-	if (headOrder->getShares() <= order.getShares()) {
-		int filledShares = headOrder->getShares();
+    this->volume -= headOrder->getShares();
+    order.setShares(order.getShares() - headOrder->getShares());
 
-		this->volume -= headOrder->getShares();
-		order.setShares(order.getShares() - headOrder->getShares());
-		
-		std::cout << (order.getBuyOrSell() ? "Buy" : "Sell") << " " << (order.getShares() == 0 ? "[FILL]" : "[PARTIAL FILL]") << " for " << filledShares << " @ " << headOrder->getLimitPrice() << "\n";
+    std::cout << std::left << (order.getBuyOrSell() ? "Buy" : "Sell") << " "
+              << (order.getShares() == 0 ? "[FILL]" : "[PARTIAL FILL]")
+              << std::setw(29) << " for " << filledShares << " @ "
+              << headOrder->getLimitPrice() << "\n";
 
-		Order* tempOrder = headOrder;
-		headOrder = headOrder->nextOrder;
-		if (headOrder != nullptr) {
-			headOrder->prevOrder = nullptr;
+    Order *tempOrder = headOrder;
+    headOrder = headOrder->nextOrder;
+    if (headOrder != nullptr) {
+      headOrder->prevOrder = nullptr;
 
-			delete tempOrder;
-		} else {
-			orderBook->deleteLimitFromAVLTree(this, !order.getBuyOrSell());
-			delete headOrder;
-			delete tempOrder;
-		}
-		return;
-	}
-	int filledShares = order.getShares();
-	this->volume -= order.getShares();
-	headOrder->setShares(headOrder->getShares() - order.getShares());
+      delete tempOrder;
+    } else {
+      orderBook->deleteLimitFromAVLTree(this, !order.getBuyOrSell());
+      delete headOrder;
+      delete tempOrder;
+    }
+    return;
+  }
+  int filledShares = order.getShares();
+  this->volume -= order.getShares();
+  headOrder->setShares(headOrder->getShares() - order.getShares());
 
-	std::cout << (order.getBuyOrSell() ? "Buy" : "Sell") << " [FILL]" << " for " << filledShares << " @ " << headOrder->getLimitPrice() << "\n";
-	return;
+  std::cout << std::left << (order.getBuyOrSell() ? "Buy" : "Sell") << " [FILL]"
+            << std::setw(29) << " for " << filledShares << " @ "
+            << headOrder->getLimitPrice() << "\n";
+  return;
 }

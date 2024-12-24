@@ -1,5 +1,6 @@
-#include <iostream>
 #include <algorithm>
+#include <iomanip>
+#include <iostream>
 
 #include "order_book.h"
 
@@ -17,22 +18,36 @@ Limit *OrderBook::getHighestStopSell() { return highestStopSell; }
 void OrderBook::addOrder(Order &newOrder) {
   // market order
   if (newOrder.getLimitPrice() == 0 && newOrder.getStopPrice() == 0) {
-    std::cout << (newOrder.getBuyOrSell() ? "Buy" : "Sell") << " [MARKET ORDER SUBMITTED] for " << newOrder.getShares() << "\n";
+    std::cout << std::left << std::setw(5)
+              << (newOrder.getBuyOrSell() ? "Buy" : "Sell") << std::setw(29)
+              << "[MARKET ORDER SUBMITTED]" << "for " << newOrder.getShares()
+              << "\n";
     addMarketOrder(newOrder);
   }
 
   // limit order
   if (newOrder.getLimitPrice() > 0 && newOrder.getStopPrice() == 0) {
-    std::cout << (newOrder.getBuyOrSell() ? "Buy" : "Sell") << " [LIMIT ORDER SUBMITTED] for " << newOrder.getShares() << " @ Limit Price: " << newOrder.getLimitPrice() << "\n";
+    std::cout << std::left << std::setw(5)
+              << (newOrder.getBuyOrSell() ? "Buy" : "Sell") << std::setw(29)
+              << "[LIMIT ORDER SUBMITTED]" << " for " << newOrder.getShares()
+              << " @ Limit Price: " << newOrder.getLimitPrice() << "\n";
     addLimitOrder(newOrder);
   }
 
   // stop order or stop limit order
   if (newOrder.getStopPrice() > 0) {
     if (newOrder.getStopPrice() > 0 && newOrder.getLimitPrice() == 0) {
-      std::cout << (newOrder.getBuyOrSell() ? "Buy" : "Sell") << " [STOP ORDER SUBMITTED] for " << newOrder.getShares() << " @ Limit Price: " << newOrder.getLimitPrice() << " @ Stop Price: " << newOrder.getStopPrice() << "\n";
+      std::cout << std::left << std::setw(5)
+                << (newOrder.getBuyOrSell() ? "Buy" : "Sell") << std::setw(29)
+                << "[STOP ORDER SUBMITTED]" << " for " << newOrder.getShares()
+                << " @ Limit Price: " << newOrder.getLimitPrice()
+                << " @ Stop Price:" << newOrder.getStopPrice() << "\n";
     } else {
-      std::cout << (newOrder.getBuyOrSell() ? "Buy" : "Sell") << " [STOP LIMIT ORDER SUBMITTED] for " << newOrder.getShares() << " @ Limit Price: " << newOrder.getLimitPrice() << " @ Stop Price: " << newOrder.getStopPrice() << "\n";
+      std::cout << std::setw(5) << (newOrder.getBuyOrSell() ? "Buy" : "Sell")
+                << std::setw(29) << "[STOP LIMIT ORDER SUBMITTED]" << " for "
+                << newOrder.getShares()
+                << " @ Limit Price: " << newOrder.getLimitPrice()
+                << " @ Stop Price: " << newOrder.getStopPrice() << "\n";
     }
     addStopOrder(newOrder);
   }
@@ -40,14 +55,14 @@ void OrderBook::addOrder(Order &newOrder) {
 
 int OrderBook::marketOrderHelper(Limit *edge, Order &order) {
   // TODO: What determines the price of the edge when limit price is 0
-  // Do we just match all possible shares automatically? - What does the real world scenario look like?
-  while (edge != nullptr && (
-          (order.getLimitPrice() == 0 ||
-            (
-              (order.getBuyOrSell() && order.getLimitPrice() >= edge->getLimitPrice()) ||
-              (!order.getBuyOrSell() && order.getLimitPrice() <= edge->getLimitPrice())
-            )
-          ) &&
+  // Do we just match all possible shares automatically? - What does the real
+  // world scenario look like?
+  while (edge != nullptr &&
+         ((order.getLimitPrice() == 0 ||
+           ((order.getBuyOrSell() &&
+             order.getLimitPrice() >= edge->getLimitPrice()) ||
+            (!order.getBuyOrSell() &&
+             order.getLimitPrice() <= edge->getLimitPrice()))) &&
           (edge->getHeadOrder() != nullptr && order.getShares() != 0))) {
     edge->execute(edge->getHeadOrder(), order);
   }
@@ -57,9 +72,13 @@ int OrderBook::marketOrderHelper(Limit *edge, Order &order) {
 
 void OrderBook::executeStopOrders(int buyOrSell) {
   if (buyOrSell) {
-    while (lowestStopBuy != nullptr && (
-            lowestSell == nullptr || lowestStopBuy->getStopPrice() >= lowestSell->getLimitPrice())) {
-      std::cout << "Buy [STOP ORDER] @ " << lowestStopBuy->getStopPrice() << " as Limit Order @ " << lowestStopBuy->getLimitPrice() << "\n";
+    while (lowestStopBuy != nullptr &&
+           (lowestSell == nullptr ||
+            lowestStopBuy->getStopPrice() >= lowestSell->getLimitPrice())) {
+      std::cout << std::left << std::setw(5) << "Buy" << std::setw(29)
+                << "[STOP ORDER]" << " @ " << lowestStopBuy->getStopPrice()
+                << " as Limit Order @ " << lowestStopBuy->getLimitPrice()
+                << "\n";
       addLimitOrder(*(lowestStopBuy->getHeadOrder()));
       lowestStopBuy->headOrder = lowestStopBuy->getHeadOrder()->getNextOrder();
       if (lowestStopBuy->headOrder == nullptr) {
@@ -69,9 +88,13 @@ void OrderBook::executeStopOrders(int buyOrSell) {
       lowestStopBuy->headOrder->setPrevOrder(nullptr);
     }
   } else {
-    while (highestStopSell != nullptr && (
-            highestBuy == nullptr || highestStopSell->getStopPrice() <= highestBuy->getLimitPrice())) {
-      std::cout << "Sell [STOP ORDER] @ " << lowestStopBuy->getStopPrice() << " as Limit Order @ " << lowestStopBuy->getLimitPrice() << "\n";
+    while (highestStopSell != nullptr &&
+           (highestBuy == nullptr ||
+            highestStopSell->getStopPrice() <= highestBuy->getLimitPrice())) {
+      std::cout << std::left << std::setw(5) << "Sell" << std::setw(29)
+                << "[STOP ORDER]" << "for" << lowestStopBuy->getStopPrice()
+                << " as Limit Order @ " << lowestStopBuy->getLimitPrice()
+                << "\n";
       addLimitOrder(*(highestStopSell->getHeadOrder()));
       highestStopSell->headOrder =
           highestStopSell->getHeadOrder()->getNextOrder();
@@ -108,11 +131,12 @@ void OrderBook::addLimitOrder(Order &order) {
 
 void OrderBook::addLimitOrderToLimitQueue(Order &order) {
   int limitPrice = order.getLimitPrice();
-  std::unordered_map<int, Limit *>* limitMap =
+  std::unordered_map<int, Limit *> *limitMap =
       order.getBuyOrSell() ? buyLimitMap : sellLimitMap;
 
   if (limitMap->find(limitPrice) == limitMap->end()) {
-    // TODO: If limitPrice is potentially zero, consider having 0 be the min/max on the tree depending on the side (buy/sell)
+    // TODO: If limitPrice is potentially zero, consider having 0 be the min/max
+    // on the tree depending on the side (buy/sell)
     insertLimitIntoAVLTree(limitPrice, order.getBuyOrSell());
   }
 
@@ -120,10 +144,12 @@ void OrderBook::addLimitOrderToLimitQueue(Order &order) {
   limit->addOrder(&order);
 }
 
-void OrderBook::insertLimitIntoAVLTree(const int limitPrice, const int buyOrSell) {
+void OrderBook::insertLimitIntoAVLTree(const int limitPrice,
+                                       const int buyOrSell) {
   Limit *tree = buyOrSell ? buyTree : sellTree;
   Limit *edge = buyOrSell ? highestBuy : lowestSell;
-  std::unordered_map<int, Limit *>* limitMap = buyOrSell ? buyLimitMap : sellLimitMap;
+  std::unordered_map<int, Limit *> *limitMap =
+      buyOrSell ? buyLimitMap : sellLimitMap;
 
   if (tree == nullptr) {
     Limit *newLimit = new Limit(this, limitPrice);
@@ -167,21 +193,22 @@ void OrderBook::addStopOrder(Order &order) {
   }
 }
 
-bool OrderBook::addStopOrderAsMarketOrLimitOrder(Limit *edgeLimit, Order &order) {
+bool OrderBook::addStopOrderAsMarketOrLimitOrder(Limit *edgeLimit,
+                                                 Order &order) {
   if (order.getBuyOrSell() &&
       (edgeLimit == nullptr ||
        (edgeLimit != nullptr &&
         order.getStopPrice() >= edgeLimit->getLimitPrice()))) {
-    // TODO: If stopPrice is greater than edgeLimit, shouldn't we check for limitPrice; if it is 0 shouldn't we
-    // try to execute the order immeidately?
+    // TODO: If stopPrice is greater than edgeLimit, shouldn't we check for
+    // limitPrice; if it is 0 shouldn't we try to execute the order immeidately?
     addLimitOrder(order);
     return true;
   } else if (!order.getBuyOrSell() &&
              (edgeLimit == nullptr ||
               (edgeLimit != nullptr &&
                order.getStopPrice() <= edgeLimit->getLimitPrice()))) {
-    // TODO: If stopPrice is less than edgeLimit, shouldn't we check for limitPrice; if it is 0 shouldn't we
-    // try to execute the order immeidately?
+    // TODO: If stopPrice is less than edgeLimit, shouldn't we check for
+    // limitPrice; if it is 0 shouldn't we try to execute the order immeidately?
     addLimitOrder(order);
     return true;
   }
@@ -193,7 +220,7 @@ void OrderBook::addStopOrderToStopQueue(Order &order) {
   int stopPrice = order.getStopPrice();
   int limitPrice = order.getLimitPrice();
 
-  std::unordered_map<int, Limit *>* stopMap =
+  std::unordered_map<int, Limit *> *stopMap =
       order.getBuyOrSell() ? stopBuyMap : stopSellMap;
 
   if (stopMap->find(stopPrice) == stopMap->end()) {
@@ -204,11 +231,13 @@ void OrderBook::addStopOrderToStopQueue(Order &order) {
   stopLimit->addOrder(&order);
 }
 
-void OrderBook::insertStopLimitIntoAVLTree(const int stopPrice, const int limitPrice, const int buyOrSell) {
+void OrderBook::insertStopLimitIntoAVLTree(const int stopPrice,
+                                           const int limitPrice,
+                                           const int buyOrSell) {
   Limit *tree = buyOrSell ? stopBuyTree : stopSellTree;
   Limit *edge = buyOrSell ? lowestStopBuy : highestStopSell;
 
-  std::unordered_map<int, Limit *>* stopMap =
+  std::unordered_map<int, Limit *> *stopMap =
       buyOrSell ? stopBuyMap : stopSellMap;
 
   if (tree == nullptr) {
@@ -226,7 +255,8 @@ void OrderBook::insertStopLimitIntoAVLTree(const int stopPrice, const int limitP
   updateBookStopEdgeOnInsert(newStopLimit, buyOrSell);
 }
 
-void OrderBook::updateBookStopEdgeOnInsert(Limit *newStopLimit, const int buyOrSell) {
+void OrderBook::updateBookStopEdgeOnInsert(Limit *newStopLimit,
+                                           const int buyOrSell) {
   Limit *edge = buyOrSell ? lowestStopBuy : highestStopSell;
   if (buyOrSell) {
     if (lowestStopBuy != nullptr &&
@@ -244,8 +274,6 @@ void OrderBook::updateBookStopEdgeOnInsert(Limit *newStopLimit, const int buyOrS
     }
   }
 }
-
-
 
 Limit *OrderBook::_insert(Limit *root, const int limitPrice) {
   if (root == nullptr) {
@@ -288,7 +316,8 @@ Limit *OrderBook::_insert(Limit *root, const int limitPrice) {
   return root;
 }
 
-Limit *OrderBook::_insert(Limit *root, const int stopPrice, const int limitPrice) {
+Limit *OrderBook::_insert(Limit *root, const int stopPrice,
+                          const int limitPrice) {
   if (root == nullptr) {
     return new Limit(this, limitPrice, stopPrice);
   }
@@ -332,7 +361,7 @@ Limit *OrderBook::_insert(Limit *root, const int stopPrice, const int limitPrice
 void OrderBook::deleteLimitFromAVLTree(Limit *limit, int buyOrSell) {
   Limit *tree = buyOrSell ? buyTree : sellTree;
 
-  std::unordered_map<int, Limit *>* limitMap =
+  std::unordered_map<int, Limit *> *limitMap =
       buyOrSell ? buyLimitMap : sellLimitMap;
 
   updateBookEdgeOnDelete(limit, buyOrSell);
@@ -483,7 +512,7 @@ Limit *OrderBook::_stopDelete(Limit *root, const int stopPrice) {
 void OrderBook::deleteStopLimitFromAVLTree(Limit *limit, int buyOrSell) {
   Limit *tree = buyOrSell ? stopBuyTree : stopSellTree;
 
-  std::unordered_map<int, Limit *>* stopLimitMap =
+  std::unordered_map<int, Limit *> *stopLimitMap =
       buyOrSell ? stopBuyMap : stopSellMap;
 
   updateBookStopEdgeOnDelete(limit, buyOrSell);
