@@ -7,7 +7,9 @@ class OrderBook;
 class Limit {
 
 public: 
-	Limit(OrderBook* orderBook, int limitPrice, int stopPrice = 0);
+	Limit(OrderBook* orderBook, int limitPrice, int stopPrice = 0, Limit* parent = nullptr);
+	Limit(OrderBook* orderBook, int limitPrice, Limit* parent = nullptr);
+
 
 	int getLimitPrice() const;
 	int getStopPrice() const;

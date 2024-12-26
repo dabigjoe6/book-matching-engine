@@ -6,8 +6,12 @@
 #include "../OrderBook/order_book.h"
 #include "limit.h"
 
-Limit::Limit(OrderBook *orderBook, int limitPrice, int stopPrice)
-    : orderBook(orderBook), limitPrice(limitPrice), stopPrice(stopPrice) {}
+Limit::Limit(OrderBook *orderBook, int limitPrice, int stopPrice, Limit *parent)
+    : orderBook(orderBook), limitPrice(limitPrice), stopPrice(stopPrice),
+      parent(parent) {}
+
+Limit::Limit(OrderBook *orderBook, int limitPrice, Limit *parent)
+    : orderBook(orderBook), limitPrice(limitPrice), parent(parent) {}
 
 int Limit::getLimitPrice() const { return limitPrice; }
 
@@ -34,37 +38,37 @@ int Limit::getVolume() const { return volume; }
 Order *Limit::getHeadOrder() const { return headOrder; }
 Order *Limit::getTailOrder() const { return tailOrder; }
 
-void Limit::execute(Order *headOrder, Order &order) {
-  if (headOrder->getShares() <= order.getShares()) {
-    int filledShares = headOrder->getShares();
+void Limit::execute(Order *oppositeHeadOrder, Order &order) {
+  if (oppositeHeadOrder->getShares() <= order.getShares()) {
+    int filledShares = oppositeHeadOrder->getShares();
 
-    this->volume -= headOrder->getShares();
-    order.setShares(order.getShares() - headOrder->getShares());
+    this->volume -= oppositeHeadOrder->getShares();
+    order.setShares(order.getShares() - oppositeHeadOrder->getShares());
 
     std::cout << std::left << (order.getBuyOrSell() ? "Buy" : "Sell") << " "
               << (order.getShares() == 0 ? "[FILL]" : "[PARTIAL FILL]")
               << std::setw(29) << " for " << filledShares << " @ "
-              << headOrder->getLimitPrice() << "\n";
+              << oppositeHeadOrder->getLimitPrice() << "\n";
 
-    Order *tempOrder = headOrder;
-    headOrder = headOrder->nextOrder;
-    if (headOrder != nullptr) {
-      headOrder->prevOrder = nullptr;
+    Order *tempOrder = oppositeHeadOrder;
+    oppositeHeadOrder = headOrder->nextOrder;
+    if (oppositeHeadOrder != nullptr) {
+      oppositeHeadOrder->prevOrder = nullptr;
 
       delete tempOrder;
     } else {
       orderBook->deleteLimitFromAVLTree(this, !order.getBuyOrSell());
-      delete headOrder;
+      delete oppositeHeadOrder;
       delete tempOrder;
     }
     return;
   }
   int filledShares = order.getShares();
   this->volume -= order.getShares();
-  headOrder->setShares(headOrder->getShares() - order.getShares());
+  oppositeHeadOrder->setShares(headOrder->getShares() - order.getShares());
 
   std::cout << std::left << (order.getBuyOrSell() ? "Buy" : "Sell") << " [FILL]"
             << std::setw(29) << " for " << filledShares << " @ "
-            << headOrder->getLimitPrice() << "\n";
+            << oppositeHeadOrder->getLimitPrice() << "\n";
   return;
 }

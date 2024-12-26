@@ -12,13 +12,7 @@
 namespace fs = std::filesystem;
 
 OrderGenerator::OrderGenerator(OrderBook *orderBook)
-    : orderBook(orderBook), gen(rd()) {
-  try {
-    openFile("initial_orders.txt");
-  } catch (const std::exception &e) {
-    std::cerr << "Exception caught: " << e.what() << std::endl;
-  }
-}
+    : orderBook(orderBook), gen(rd()) {}
 
 OrderGenerator::~OrderGenerator() {
   if (file.is_open()) {
@@ -37,24 +31,10 @@ void OrderGenerator::openFile(std::string filePathString) {
   }
 }
 
-void OrderGenerator::generateInitialOrders(int noOfOrders) {
-  for (int i = 0; i < noOfOrders; ++i) {
-    Order *newOrder = generateOrder();
-    if (newOrder->getStopPrice() == 0) {
-      orderBook->addLimitOrderToLimitQueue(*newOrder);
-    } else {
-      orderBook->addStopOrderToStopQueue(*newOrder);
-    }
-
-    file << "Order " << newOrder->getShares() << "\t"
-         << newOrder->getBuyOrSell() << "\t" << newOrder->getLimitPrice()
-         << "\t" << newOrder->getStopPrice() << "\n";
-  }
-}
-
-void OrderGenerator::generateOrders(int noOfOrders) {
+void OrderGenerator::generateOrders(const std::string &file_name,
+                                    const int &noOfOrders) {
   try {
-    openFile("orders.txt");
+    openFile(file_name);
   } catch (const std::exception &e) {
     std::cerr << "Exception caught: " << e.what() << std::endl;
     file.clear();
@@ -95,17 +75,28 @@ Order *OrderGenerator::generateOrder() {
 
 void OrderGenerator::simulateMarket() {
   // read and parse orders from orders.txt
-  processOrders(readOrders());
+  processInitialOrders(readOrders("initial_orders.txt"));
+  processOrders(readOrders("orders.txt"));
 }
 
-void OrderGenerator::processOrders(std::vector<Order *> readOrders) {
+void OrderGenerator::processInitialOrders(
+    const std::vector<Order *> &readOrders) {
+  for (Order *order : readOrders) {
+    if (order->getStopPrice() == 0) {
+      orderBook->addLimitOrderToLimitQueue(*order);
+    } else {
+      orderBook->addStopOrderToStopQueue(*order);
+    }
+  }
+}
+void OrderGenerator::processOrders(const std::vector<Order *> &readOrders) {
   for (Order *order : readOrders) {
     orderBook->addOrder(*order);
   }
 }
 
-std::vector<Order *> OrderGenerator::readOrders() {
-  std::ifstream inputFile(fs::current_path() / "orders.txt");
+std::vector<Order *> OrderGenerator::readOrders(const std::string &file_name) {
+  std::ifstream inputFile(fs::current_path() / file_name);
   if (!inputFile.is_open()) {
     std::cerr << "Could not read orders" << std::endl;
     return {};

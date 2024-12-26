@@ -68,8 +68,8 @@ private:
 	void updateBookEdgeOnDelete(Limit* limit, const int buyOrSell);
 	void updateBookStopEdgeOnDelete(Limit* limit, const int buyOrSell);
 
-	Limit* _insert(Limit* root, const int limitPrice);
-	Limit* _insert(Limit* root, const int stopPrice, const int limitPrice);
+	Limit* _insert(Limit* root, const int limitPrice, Limit* parent);
+	Limit* _insert(Limit* root, const int stopPrice, const int limitPrice, Limit* parent);
 
 	Limit* _delete(Limit* root, const int limitPrice);
 	Limit* _stopDelete(Limit* root, const int stopPrice);
