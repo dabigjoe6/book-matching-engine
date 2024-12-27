@@ -167,25 +167,41 @@ void OrderBook::insertLimitIntoAVLTree(const int price, const int buyOrSell) {
     return;
   }
 
-  Limit *newLimit = _insert(tree, price, type, nullptr);
-  limitMap->try_emplace(price, newLimit);
-  updateBookEdgeOnInsert(newLimit, buyOrSell);
+  _insert(tree, price, type, limitMap, nullptr);
 }
 
-void OrderBook::updateBookEdgeOnInsert(Limit *newLimit, const int buyOrSell) {
-  if (buyOrSell) {
-    if (highestBuy != nullptr &&
-        newLimit->getPrice() > highestBuy->getPrice()) {
-      highestBuy = newLimit;
-    } else if (highestBuy == nullptr) {
-      highestBuy = newLimit;
+void OrderBook::updateBookEdgeOnInsert(Limit *newLimit, const LimitType &type) {
+  if (type == LimitType::LimitSell || type == LimitType::LimitBuy) {
+    if (type == LimitType::LimitBuy) {
+      if (highestBuy != nullptr &&
+          newLimit->getPrice() > highestBuy->getPrice()) {
+        highestBuy = newLimit;
+      } else if (highestBuy == nullptr) {
+        highestBuy = newLimit;
+      }
+    } else {
+      if (lowestSell != nullptr &&
+          newLimit->getPrice() < lowestSell->getPrice()) {
+        lowestSell = newLimit;
+      } else if (lowestSell == nullptr) {
+        lowestSell = newLimit;
+      }
     }
   } else {
-    if (lowestSell != nullptr &&
-        newLimit->getPrice() < lowestSell->getPrice()) {
-      lowestSell = newLimit;
-    } else if (lowestSell == nullptr) {
-      lowestSell = newLimit;
+    if (type == LimitType::StopBuy) {
+      if (lowestStopBuy != nullptr &&
+          newLimit->getPrice() < lowestStopBuy->getPrice()) {
+        lowestStopBuy = newLimit;
+      } else if (lowestStopBuy == nullptr) {
+        lowestStopBuy = newLimit;
+      }
+    } else {
+      if (highestStopSell != nullptr &&
+          newLimit->getPrice() > highestStopSell->getPrice()) {
+        highestStopSell = newLimit;
+      } else if (highestStopSell == nullptr) {
+        highestStopSell = newLimit;
+      }
     }
   }
 }
@@ -258,41 +274,23 @@ void OrderBook::insertStopLimitIntoAVLTree(const int price,
     return;
   }
 
-  Limit *newStopLimit = _insert(tree, price, type, nullptr);
-  stopMap->try_emplace(price, newStopLimit);
-  updateBookStopEdgeOnInsert(newStopLimit, buyOrSell);
+  _insert(tree, price, type, stopMap, nullptr);
 }
 
-void OrderBook::updateBookStopEdgeOnInsert(Limit *newStopLimit,
-                                           const int buyOrSell) {
-  Limit *edge = buyOrSell ? lowestStopBuy : highestStopSell;
-  if (buyOrSell) {
-    if (lowestStopBuy != nullptr &&
-        newStopLimit->getPrice() < lowestStopBuy->getPrice()) {
-      lowestStopBuy = newStopLimit;
-    } else if (lowestStopBuy == nullptr) {
-      lowestStopBuy = newStopLimit;
-    }
-  } else {
-    if (highestStopSell != nullptr &&
-        newStopLimit->getPrice() > highestStopSell->getPrice()) {
-      highestStopSell = newStopLimit;
-    } else if (highestStopSell == nullptr) {
-      highestStopSell = newStopLimit;
-    }
-  }
-}
-
-Limit *OrderBook::_insert(Limit *root, const int price, const LimitType type,
+Limit *OrderBook::_insert(Limit *root, const int &price, const LimitType &type,
+                          std::unordered_map<int, Limit *> *limitMap,
                           Limit *parent) {
   if (root == nullptr) {
-    return new Limit(this, price, type, parent);
+    Limit *newLimit = new Limit(this, price, type, parent);
+    limitMap->try_emplace(price, newLimit);
+    updateBookEdgeOnInsert(newLimit, type);
+    return newLimit;
   }
 
   if (price < root->price) {
-    root->leftLimit = _insert(root->leftLimit, price, type, root);
+    root->leftLimit = _insert(root->leftLimit, price, type, limitMap, root);
   } else if (price > root->price) {
-    root->rightLimit = _insert(root->rightLimit, price, type, root);
+    root->rightLimit = _insert(root->rightLimit, price, type, limitMap, root);
   } else {
     return root; // no duplicate limitPrice
   }
@@ -331,35 +329,38 @@ void OrderBook::deleteLimitFromAVLTree(Limit *limit, int buyOrSell) {
   std::unordered_map<int, Limit *> *limitMap =
       buyOrSell ? buyLimitMap : sellLimitMap;
 
-  updateBookEdgeOnDelete(limit, buyOrSell);
+  LimitType type = buyOrSell ? LimitType::LimitBuy : LimitType::LimitSell;
+
+  updateBookEdgeOnDelete(limit, type);
   _delete(tree, limit->getPrice());
   limitMap->erase(limit->getPrice());
 }
 
-void OrderBook::updateBookEdgeOnDelete(Limit *limit, const int buyOrSell) {
-  Limit *edge = buyOrSell ? highestBuy : lowestSell;
+void OrderBook::updateBookEdgeOnDelete(Limit *limit, const LimitType &type) {
+  Limit *edge;
 
-  if (limit == edge) {
-    if (buyOrSell && limit->leftLimit != nullptr) {
-      highestBuy = limit->leftLimit;
-    } else if (!buyOrSell && limit->rightLimit != nullptr) {
-      lowestSell = limit->rightLimit;
-    } else {
-      edge = limit->parent;
+  if (type == LimitType::LimitBuy || type == LimitType::LimitSell) {
+    edge = type == LimitType::LimitBuy ? highestBuy : lowestSell;
+    if (limit == edge) {
+      if (type == LimitType::LimitBuy && limit->leftLimit != nullptr) {
+        highestBuy = limit->leftLimit;
+      } else if (type == LimitType::LimitSell && limit->rightLimit != nullptr) {
+        lowestSell = limit->rightLimit;
+      } else {
+        edge = limit->parent;
+      }
     }
-  }
-}
+  } else {
+    edge = type == LimitType::StopBuy ? lowestStopBuy : highestStopSell;
 
-void OrderBook::updateBookStopEdgeOnDelete(Limit *limit, const int buyOrSell) {
-  Limit *edge = buyOrSell ? lowestStopBuy : highestStopSell;
-
-  if (limit == edge) {
-    if (buyOrSell && limit->rightLimit != nullptr) {
-      lowestStopBuy = limit->rightLimit;
-    } else if (!buyOrSell && limit->leftLimit != nullptr) {
-      highestStopSell = limit->leftLimit;
-    } else {
-      edge = limit->parent;
+    if (limit == edge) {
+      if (type == LimitType::StopBuy && limit->rightLimit != nullptr) {
+        lowestStopBuy = limit->rightLimit;
+      } else if (type == LimitType::StopSell && limit->leftLimit != nullptr) {
+        highestStopSell = limit->leftLimit;
+      } else {
+        edge = limit->parent;
+      }
     }
   }
 }
@@ -482,7 +483,9 @@ void OrderBook::deleteStopLimitFromAVLTree(Limit *limit, int buyOrSell) {
   std::unordered_map<int, Limit *> *stopLimitMap =
       buyOrSell ? stopBuyMap : stopSellMap;
 
-  updateBookStopEdgeOnDelete(limit, buyOrSell);
+  LimitType type = buyOrSell ? LimitType::StopBuy : LimitType::StopSell;
+
+  updateBookEdgeOnDelete(limit, type);
   _stopDelete(tree, limit->getPrice());
   stopLimitMap->erase(limit->getPrice());
 }

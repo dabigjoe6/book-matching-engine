@@ -64,13 +64,11 @@ private:
   void insertLimitIntoAVLTree(const int price, const int buyOrSell);
   void insertStopLimitIntoAVLTree(const int price, const int buyOrSell);
 
-  void updateBookEdgeOnInsert(Limit *newLimit, const int buyOrSell);
-  void updateBookStopEdgeOnInsert(Limit *newLimit, const int buyOrSell);
+  void updateBookEdgeOnInsert(Limit *newLimit, const LimitType& type);
+  void updateBookEdgeOnDelete(Limit *limit, const LimitType& type);
 
-  void updateBookEdgeOnDelete(Limit *limit, const int buyOrSell);
-  void updateBookStopEdgeOnDelete(Limit *limit, const int buyOrSell);
-
-  Limit *_insert(Limit *root, const int limitPrice, const LimitType type,
+  Limit *_insert(Limit *root, const int &price, const LimitType &type,
+                 std::unordered_map<int, Limit *> *limitMap,
                  Limit *parent);
 
   Limit *_delete(Limit *root, const int limitPrice);
