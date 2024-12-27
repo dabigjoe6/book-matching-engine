@@ -7,85 +7,87 @@ class Limit;
 class Order;
 class OrderGenerator;
 
+enum class LimitType;
+
 class OrderBook {
 public:
-	OrderBook();
+  OrderBook();
 
-	void addOrder(Order& newOrder);
-	
-	Limit* getHighestBuy();
-	Limit* getLowestSell();
+  void addOrder(Order &newOrder);
 
-	Limit* getHighestStopSell();
-	Limit* getLowestStopBuy();
+  Limit *getHighestBuy();
+  Limit *getLowestSell();
 
-	void deleteLimitFromAVLTree(Limit* limit, int buyOrSell);
-	void deleteStopLimitFromAVLTree(Limit* limit, int buyOrSell);
+  Limit *getHighestStopSell();
+  Limit *getLowestStopBuy();
+
+  void deleteLimitFromAVLTree(Limit *limit, int buyOrSell);
+  void deleteStopLimitFromAVLTree(Limit *limit, int buyOrSell);
 
 private:
-	Limit* buyTree = nullptr;
-	Limit* sellTree = nullptr;
+  Limit *buyTree = nullptr;
+  Limit *sellTree = nullptr;
 
-	Limit* stopBuyTree = nullptr;
-	Limit* stopSellTree = nullptr;
+  Limit *stopBuyTree = nullptr;
+  Limit *stopSellTree = nullptr;
 
-	Limit* highestBuy;
-	Limit* lowestSell;
+  Limit *highestBuy;
+  Limit *lowestSell;
 
-	Limit* highestStopSell;
-	Limit* lowestStopBuy;
+  Limit *highestStopSell;
+  Limit *lowestStopBuy;
 
-	std::unordered_map<int, Limit*> _buyLimitMap = {};
-	std::unordered_map<int, Limit*>* buyLimitMap = &_buyLimitMap;
+  std::unordered_map<int, Limit *> _buyLimitMap = {};
+  std::unordered_map<int, Limit *> *buyLimitMap = &_buyLimitMap;
 
-	std::unordered_map<int, Limit*> _sellLimitMap = {};
-	std::unordered_map<int, Limit*>* sellLimitMap = &_sellLimitMap;
+  std::unordered_map<int, Limit *> _sellLimitMap = {};
+  std::unordered_map<int, Limit *> *sellLimitMap = &_sellLimitMap;
 
-	std::unordered_map<int, Limit*> _stopBuyMap = {};	
-	std::unordered_map<int, Limit*>* stopBuyMap = &_stopBuyMap;
+  std::unordered_map<int, Limit *> _stopBuyMap = {};
+  std::unordered_map<int, Limit *> *stopBuyMap = &_stopBuyMap;
 
-	std::unordered_map<int, Limit*> _stopSellMap = {};	
-	std::unordered_map<int, Limit*>* stopSellMap = &_stopSellMap;
+  std::unordered_map<int, Limit *> _stopSellMap = {};
+  std::unordered_map<int, Limit *> *stopSellMap = &_stopSellMap;
 
-	void addMarketOrder(Order& order);
-	void addLimitOrder(Order& order);
-	void addStopOrder(Order& order);
+  void addMarketOrder(Order &order);
+  void addLimitOrder(Order &order);
+  void addStopOrder(Order &order);
 
-	void addLimitOrderToLimitQueue(Order& order);
-	void addStopOrderToStopQueue(Order& order);
+  void addLimitOrderToLimitQueue(Order &order);
+  void addStopOrderToStopQueue(Order &order);
 
-	int marketOrderHelper(Limit* limit, Order& order);
-	bool addStopOrderAsMarketOrLimitOrder(Limit* edgeLimit, Order& order);
+  int marketOrderHelper(Limit *limit, Order &order);
+  bool addStopOrderAsMarketOrLimitOrder(Limit *edgeLimit, Order &order);
 
-	void executeStopOrders(int buyOrSell);
+  void executeStopOrders(int buyOrSell);
 
-	void insertLimitIntoAVLTree(const int limitPrice, const int buyOrSell);
-	void insertStopLimitIntoAVLTree(const int stopPrice, const int limitPrice, const int buyOrSell);
+  void insertLimitIntoAVLTree(const int price, const int buyOrSell);
+  void insertStopLimitIntoAVLTree(const int price, const int buyOrSell);
 
-	void updateBookEdgeOnInsert(Limit* newLimit, const int buyOrSell);
-	void updateBookStopEdgeOnInsert(Limit* newLimit, const int buyOrSell);
-	
-	void updateBookEdgeOnDelete(Limit* limit, const int buyOrSell);
-	void updateBookStopEdgeOnDelete(Limit* limit, const int buyOrSell);
+  void updateBookEdgeOnInsert(Limit *newLimit, const int buyOrSell);
+  void updateBookStopEdgeOnInsert(Limit *newLimit, const int buyOrSell);
 
-	Limit* _insert(Limit* root, const int limitPrice, Limit* parent);
-	Limit* _insert(Limit* root, const int stopPrice, const int limitPrice, Limit* parent);
+  void updateBookEdgeOnDelete(Limit *limit, const int buyOrSell);
+  void updateBookStopEdgeOnDelete(Limit *limit, const int buyOrSell);
 
-	Limit* _delete(Limit* root, const int limitPrice);
-	Limit* _stopDelete(Limit* root, const int stopPrice);
+  Limit *_insert(Limit *root, const int limitPrice, const LimitType type,
+                 Limit *parent);
 
-	void updateHeight(Limit* root);
+  Limit *_delete(Limit *root, const int limitPrice);
+  Limit *_stopDelete(Limit *root, const int stopPrice);
 
-	int getHeight(const Limit* node);
-	int getBalance(const Limit* node);
+  void updateHeight(Limit *root);
 
-	Limit* getMinValueNode(Limit* node);
+  int getHeight(const Limit *node);
+  int getBalance(const Limit *node);
 
-	Limit* rotateLeft(Limit* root);
+  Limit *getMinValueNode(Limit *node);
 
-	Limit* rotateRight(Limit* root);
+  Limit *rotateLeft(Limit *root);
 
-	friend OrderGenerator;
+  Limit *rotateRight(Limit *root);
+
+  friend OrderGenerator;
 };
 
 #endif

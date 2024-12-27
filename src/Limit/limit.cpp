@@ -6,16 +6,10 @@
 #include "../OrderBook/order_book.h"
 #include "limit.h"
 
-Limit::Limit(OrderBook *orderBook, int limitPrice, int stopPrice, Limit *parent)
-    : orderBook(orderBook), limitPrice(limitPrice), stopPrice(stopPrice),
-      parent(parent) {}
+Limit::Limit(OrderBook *orderBook, int price, LimitType type, Limit *parent)
+    : orderBook(orderBook), price(price), type(type), parent(parent) {}
 
-Limit::Limit(OrderBook *orderBook, int limitPrice, Limit *parent)
-    : orderBook(orderBook), limitPrice(limitPrice), parent(parent) {}
-
-int Limit::getLimitPrice() const { return limitPrice; }
-
-int Limit::getStopPrice() const { return stopPrice; }
+int Limit::getPrice() const { return price; }
 
 void Limit::addOrder(Order *order) {
   if (order == nullptr) {
@@ -54,7 +48,7 @@ void Limit::execute(Order *oppositeHeadOrder, Order &order) {
     oppositeHeadOrder = headOrder->nextOrder;
     if (oppositeHeadOrder != nullptr) {
       oppositeHeadOrder->prevOrder = nullptr;
-
+      headOrder = oppositeHeadOrder;
       delete tempOrder;
     } else {
       orderBook->deleteLimitFromAVLTree(this, !order.getBuyOrSell());
@@ -63,6 +57,7 @@ void Limit::execute(Order *oppositeHeadOrder, Order &order) {
     }
     return;
   }
+
   int filledShares = order.getShares();
   this->volume -= order.getShares();
   oppositeHeadOrder->setShares(headOrder->getShares() - order.getShares());

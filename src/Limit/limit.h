@@ -4,15 +4,19 @@
 class Order;
 class OrderBook;
 
+enum class LimitType {
+	LimitBuy,
+	LimitSell,
+	StopBuy,
+	StopSell
+};
+
 class Limit {
 
 public: 
-	Limit(OrderBook* orderBook, int limitPrice, int stopPrice = 0, Limit* parent = nullptr);
-	Limit(OrderBook* orderBook, int limitPrice, Limit* parent = nullptr);
+	Limit(OrderBook* orderBook, int price, LimitType type, Limit* parent = nullptr);
 
-
-	int getLimitPrice() const;
-	int getStopPrice() const;
+	int getPrice() const;
 
 	void addOrder(Order* order);
 
@@ -24,9 +28,10 @@ public:
 	void execute(Order* headOrder, Order& order);
 private: 
 	OrderBook* orderBook;
+	
+	int price;
 
-	int limitPrice;
-	int stopPrice;
+	LimitType type;
 	
 	Order* headOrder = nullptr; 
 	Order* tailOrder = nullptr;
