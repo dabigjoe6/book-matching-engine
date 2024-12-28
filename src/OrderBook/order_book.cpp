@@ -304,7 +304,7 @@ Limit *OrderBook::_insert(Limit *root, const int &price, const LimitType &type,
   }
 
   // Right Right case
-  if (balance < 1 && price > root->rightLimit->price) {
+  if (balance < -1 && price > root->rightLimit->price) {
     return rotateLeft(root);
   }
 
@@ -315,7 +315,7 @@ Limit *OrderBook::_insert(Limit *root, const int &price, const LimitType &type,
   }
 
   // Right Left case
-  if (balance < 1 && price < root->rightLimit->price) {
+  if (balance < -1 && price < root->rightLimit->price) {
     root->rightLimit = rotateRight(root->rightLimit);
     return rotateLeft(root);
   }
@@ -501,8 +501,8 @@ Limit *OrderBook::getMinValueNode(Limit *node) {
 Limit *OrderBook::rotateLeft(Limit *node) {
   Limit *newRoot = node->rightLimit;
   node->rightLimit = newRoot->leftLimit;
-  if (node->rightLimit != nullptr) {
-    node->rightLimit->parent = node;
+  if (newRoot->leftLimit != nullptr) {
+    newRoot->leftLimit->parent = node;
   }
 
   newRoot->leftLimit = node;
@@ -515,10 +515,10 @@ Limit *OrderBook::rotateLeft(Limit *node) {
 }
 
 Limit *OrderBook::rotateRight(Limit *node) {
-  Limit *newRoot = node->rightLimit;
+  Limit *newRoot = node->leftLimit;
   node->leftLimit = newRoot->rightLimit;
-  if (node->leftLimit != nullptr) {
-    node->leftLimit->parent = node;
+  if (newRoot->rightLimit != nullptr) {
+    newRoot->rightLimit->parent = node;
   }
 
   newRoot->rightLimit = node;

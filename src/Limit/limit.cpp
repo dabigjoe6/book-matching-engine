@@ -44,16 +44,13 @@ void Limit::execute(Order *oppositeHeadOrder, Order &order) {
               << std::setw(29) << " for " << filledShares << " @ "
               << oppositeHeadOrder->getLimitPrice() << "\n";
 
-    Order *tempOrder = oppositeHeadOrder;
-    oppositeHeadOrder = headOrder->nextOrder;
-    if (oppositeHeadOrder != nullptr) {
-      oppositeHeadOrder->prevOrder = nullptr;
-      headOrder = oppositeHeadOrder;
-      delete tempOrder;
+    headOrder = headOrder->nextOrder;
+    if (headOrder != nullptr) {
+      headOrder->prevOrder = nullptr;
     } else {
       orderBook->deleteLimitFromAVLTree(this, !order.getBuyOrSell());
-      delete oppositeHeadOrder;
-      delete tempOrder;
+      delete headOrder;
+			headOrder = nullptr;
     }
     return;
   }
