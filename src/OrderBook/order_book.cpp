@@ -20,7 +20,7 @@ void OrderBook::addOrder(Order &newOrder) {
   if (newOrder.getLimitPrice() == 0 && newOrder.getStopPrice() == 0) {
     std::cout << std::left << std::setw(5)
               << (newOrder.getBuyOrSell() ? "Buy" : "Sell") << std::setw(29)
-              << "[MARKET ORDER SUBMITTED]" << "for " << newOrder.getShares()
+              << "[MARKET ORDER SUBMITTED]" << " for " << newOrder.getShares()
               << "\n";
     addMarketOrder(newOrder);
   }

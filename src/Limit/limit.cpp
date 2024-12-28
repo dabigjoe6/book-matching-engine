@@ -39,10 +39,11 @@ void Limit::execute(Order *oppositeHeadOrder, Order &order) {
     this->volume -= oppositeHeadOrder->getShares();
     order.setShares(order.getShares() - oppositeHeadOrder->getShares());
 
-    std::cout << std::left << (order.getBuyOrSell() ? "Buy" : "Sell") << " "
+    std::cout << std::left << std::setw(5)
+              << (order.getBuyOrSell() ? "Buy" : "Sell") << std::setw(29)
               << (order.getShares() == 0 ? "[FILL]" : "[PARTIAL FILL]")
-              << std::setw(29) << " for " << filledShares << " @ "
-              << oppositeHeadOrder->getLimitPrice() << "\n";
+              << " for " << filledShares << " @ "
+              << "Limit Price: " << oppositeHeadOrder->getLimitPrice() << "\n";
 
     headOrder = headOrder->nextOrder;
     if (headOrder != nullptr) {
@@ -50,7 +51,7 @@ void Limit::execute(Order *oppositeHeadOrder, Order &order) {
     } else {
       orderBook->deleteLimitFromAVLTree(this, !order.getBuyOrSell());
       delete headOrder;
-			headOrder = nullptr;
+      headOrder = nullptr;
     }
     return;
   }
@@ -59,8 +60,9 @@ void Limit::execute(Order *oppositeHeadOrder, Order &order) {
   this->volume -= order.getShares();
   oppositeHeadOrder->setShares(headOrder->getShares() - order.getShares());
 
-  std::cout << std::left << (order.getBuyOrSell() ? "Buy" : "Sell") << " [FILL]"
-            << std::setw(29) << " for " << filledShares << " @ "
-            << oppositeHeadOrder->getLimitPrice() << "\n";
+  std::cout << std::left << std::setw(5)
+            << (order.getBuyOrSell() ? "Buy" : "Sell") << std::setw(29)
+            << "[FILL]" << " for " << filledShares << " @ "
+            << "Limit Price: " << oppositeHeadOrder->getLimitPrice() << "\n";
   return;
 }

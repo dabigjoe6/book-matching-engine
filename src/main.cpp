@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
   OrderBook order_book = OrderBook();
   OrderGenerator generator = OrderGenerator(&order_book);
 
-  // generator.generateOrders("initial_orders.txt", 4);
-  // generator.generateOrders("orders.txt", 10);
+  generator.generateOrders("initial_orders.txt", 4);
+  generator.generateOrders("orders.txt", 10);
   generator.simulateMarket();
 }
