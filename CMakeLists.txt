@@ -10,7 +10,7 @@ set(CMAKE_BUILD_TYPE Debug)
 
 enable_testing()
 
-add_subdirectory(googletest)
+add_subdirectory(./googletest)
 
 set(Headers
 	./src/Order/order.h
@@ -35,4 +35,4 @@ add_executable(${PROJECT_NAME} ./src/main.cpp)
 # Link the executable with the library
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_lib)
 
-add_subdirectory(test)
+add_subdirectory(./test)
