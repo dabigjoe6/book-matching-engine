@@ -4,6 +4,8 @@ orders.txt
 /googletest
 test/CMakeFiles/**
 test/cmake_install.cmake
+
+CTestTestfile.cmake
 test/CTestTestfile.cmake
 build/**
 .env
