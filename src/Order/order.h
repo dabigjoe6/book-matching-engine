@@ -4,10 +4,15 @@
 class Order {
 
 public:
-	Order(int shares, int buyOrSell, int limitPrice = 0, int stopPrice = 0);
+	Order(int id, int shares, int buyOrSell, int limitPrice = 0, int stopPrice = 0);
+
+	int getId() const;
 
 	int getShares() const;
+	int getFilledShares() const;
+
 	void setShares(int shares);
+	void setFilledShares(int shares);
 
 	int getLimitPrice() const;
 	int getStopPrice() const;
@@ -20,7 +25,11 @@ public:
 	void setPrevOrder(Order* order);
 
 private:
+	int id;
+
 	int shares = 0;
+	int filledShares = 0;
+
 	int limitPrice = 0;
 	int stopPrice = 0;
 

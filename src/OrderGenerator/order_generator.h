@@ -28,7 +28,8 @@ private:
 
   std::ofstream file;
 
-  std::tuple<int, int> sharesRange = {0, 1000};
+  std::tuple<int, int> idRange = {100000, 999999}; 
+  std::tuple<int, int> sharesRange = {1, 1000};
   std::tuple<int, int> limitPriceRange = {50, 250};
   std::tuple<int, int> stopPriceRange = {50, 250};
 

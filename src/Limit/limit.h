@@ -25,7 +25,7 @@ public:
 	Order* getHeadOrder() const;
 	Order* getTailOrder() const;
 
-	void execute(Order* headOrder, Order& order);
+	void execute(Order* headOrder, Order* order);
 private: 
 	OrderBook* orderBook;
 	

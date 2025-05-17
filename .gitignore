@@ -2,3 +2,7 @@ CmakeFiles/*
 Session.vim
 orders.txt
 /googletest
+test/CMakeFiles/**
+test/cmake_install.cmake
+build/**
+.env

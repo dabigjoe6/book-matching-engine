@@ -13,7 +13,7 @@ class OrderBook {
 public:
   OrderBook();
 
-  void addOrder(Order &newOrder);
+  void addOrder(Order *newOrder);
 
   Limit *getHighestBuy();
   Limit *getLowestSell();
@@ -21,6 +21,8 @@ public:
   Limit *getHighestStopSell();
   Limit *getLowestStopBuy();
 
+
+  // TODO: Perhaps this should be renamed to deleteLimit not deleteLimitFromAVLTree (I believe callers shouldn't know what the implementation of the AVL tree is)
   void deleteLimitFromAVLTree(Limit *limit, int buyOrSell);
   void deleteStopLimitFromAVLTree(Limit *limit, int buyOrSell);
 
@@ -37,26 +39,32 @@ private:
   Limit *highestStopSell;
   Limit *lowestStopBuy;
 
+  // TODO: Why did I do this? - have a pointer to the map?
   std::unordered_map<int, Limit *> _buyLimitMap = {};
   std::unordered_map<int, Limit *> *buyLimitMap = &_buyLimitMap;
 
+  // TODO: Why did I do this? - have a pointer to the map?
   std::unordered_map<int, Limit *> _sellLimitMap = {};
   std::unordered_map<int, Limit *> *sellLimitMap = &_sellLimitMap;
 
+  // TODO: Why did I do this? - have a pointer to the map?
   std::unordered_map<int, Limit *> _stopBuyMap = {};
   std::unordered_map<int, Limit *> *stopBuyMap = &_stopBuyMap;
-
+  
+  // TODO: Why did I do this? - have a pointer to the map?
   std::unordered_map<int, Limit *> _stopSellMap = {};
   std::unordered_map<int, Limit *> *stopSellMap = &_stopSellMap;
 
-  void addMarketOrder(Order &order);
-  void addLimitOrder(Order &order);
-  void addStopOrder(Order &order);
+  void addMarketOrder(Order *order);
+  void addLimitOrder(Order *order);
+  void addStopOrder(Order *order);
 
   void addLimitOrderToLimitQueue(Order &order);
   void addStopOrderToStopQueue(Order &order);
 
-  int marketOrderHelper(Limit *limit, Order &order);
+
+  // TODO: What is the function of the marketOrderHelper?
+  int marketOrderHelper(Limit *limit, Order *order);
   bool addStopOrderAsMarketOrLimitOrder(Limit *edgeLimit, Order &order);
 
   void executeStopOrders(int buyOrSell);

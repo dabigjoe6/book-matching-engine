@@ -43,7 +43,7 @@ void OrderGenerator::generateOrders(const std::string &file_name,
 
   for (int i = 0; i < noOfOrders; ++i) {
     Order *newOrder = generateOrder();
-    file << "Order " << newOrder->getShares() << "\t"
+    file << newOrder->getId() << "\t" << newOrder->getShares() << "\t"
          << newOrder->getBuyOrSell() << "\t" << newOrder->getLimitPrice()
          << "\t" << newOrder->getStopPrice() << "\n"
          << std::flush;
@@ -51,6 +51,7 @@ void OrderGenerator::generateOrders(const std::string &file_name,
 }
 
 Order *OrderGenerator::generateOrder() {
+  std::uniform_int_distribution<> idDistribution(std::get<0>(idRange), std::get<1>(idRange));
   std::uniform_int_distribution<> sharesDist(std::get<0>(sharesRange),
                                              std::get<1>(sharesRange));
   std::uniform_int_distribution<> buyOrSellDist(0, 1);
@@ -60,6 +61,8 @@ Order *OrderGenerator::generateOrder() {
                                                 std::get<1>(stopPriceRange));
   std::uniform_int_distribution<> isStopPriceOrderDist(0, 1);
 
+
+  int id = idDistribution(gen);
   int shares = sharesDist(gen);
   int buyOrSell = buyOrSellDist(gen);
   int limitPrice = limitPriceDist(gen);
@@ -70,7 +73,7 @@ Order *OrderGenerator::generateOrder() {
     stopPrice = stopPriceDist(gen);
   }
 
-  return new Order(shares, buyOrSell, limitPrice, stopPrice);
+  return new Order(id, shares, buyOrSell, limitPrice, stopPrice);
 }
 
 void OrderGenerator::simulateMarket() {
@@ -91,7 +94,7 @@ void OrderGenerator::processInitialOrders(
 }
 void OrderGenerator::processOrders(const std::vector<Order *> &readOrders) {
   for (Order *order : readOrders) {
-    orderBook->addOrder(*order);
+    orderBook->addOrder(order);
   }
 }
 
@@ -102,6 +105,8 @@ std::vector<Order *> OrderGenerator::readOrders(const std::string &file_name) {
     return {};
   }
 
+
+  // TODO: Do allocation here
   std::vector<Order *> readOrders;
 
   std::string line;
@@ -111,7 +116,7 @@ std::vector<Order *> OrderGenerator::readOrders(const std::string &file_name) {
 
     i_ran_at_least_once += 1;
 
-    std::string orderId; // For now it is just 'Order'
+    int orderId;
     iss >> orderId;
 
     int shares;
@@ -127,7 +132,7 @@ std::vector<Order *> OrderGenerator::readOrders(const std::string &file_name) {
     iss >> stopPrice;
 
     Order *readOrder = new Order(shares, buyOrSell, limitPrice, stopPrice);
-    readOrders.push_back(readOrder);
+    readOrders.emplace_back(readOrder);
   }
 
   return readOrders;
