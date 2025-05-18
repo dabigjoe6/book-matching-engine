@@ -4,39 +4,39 @@
 class Order {
 
 public:
-	Order(int id, int shares, int buyOrSell, int limitPrice = 0, int stopPrice = 0);
+	Order(int id, int shares, int buy_or_sell, int limit_price = 0, int stop_price = 0);
 
-	int getId() const;
+	int get_id() const;
 
-	int getShares() const;
-	int getFilledShares() const;
+	int get_shares() const;
+	int get_filled_shares() const;
 
-	void setShares(int shares);
-	void setFilledShares(int shares);
+	void set_shares(int shares);
+	void set_filled_shares(int shares);
 
-	int getLimitPrice() const;
-	int getStopPrice() const;
-	int getBuyOrSell() const;
+	int get_limit_price() const;
+	int get_stop_price() const;
+	int get_buy_or_sell() const;
 
-	Order* getNextOrder();
-	Order* getPrevOrder();
+	Order* get_next_order();
+	Order* get_prev_order();
 
-	void setNextOrder(Order* order);
-	void setPrevOrder(Order* order);
+	void set_next_order(Order* order);
+	void set_prev_order(Order* order);
 
 private:
 	int id;
 
 	int shares = 0;
-	int filledShares = 0;
+	int filled_shares = 0;
 
-	int limitPrice = 0;
-	int stopPrice = 0;
+	int limit_price = 0;
+	int stop_price = 0;
 
-	int buyOrSell;
+	int buy_or_sell;
 
-	Order* nextOrder = nullptr;
-	Order* prevOrder = nullptr;
+	Order* next_order = nullptr;
+	Order* prev_order = nullptr;
 
 	friend class Limit;
 };

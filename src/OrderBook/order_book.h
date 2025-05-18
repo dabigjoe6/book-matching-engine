@@ -6,6 +6,7 @@
 class Limit;
 class Order;
 class OrderGenerator;
+class AvlTree;
 
 enum class LimitType;
 
@@ -13,85 +14,67 @@ class OrderBook {
 public:
   OrderBook();
 
-  void addOrder(Order *newOrder);
+  void add_order(Order *new_order);
 
-  Limit *getHighestBuy();
-  Limit *getLowestSell();
+  Limit *get_highest_buy();
+  Limit *get_lowest_sell();
 
-  Limit *getHighestStopSell();
-  Limit *getLowestStopBuy();
+  Limit *get_highest_stop_sell();
+  Limit *get_lowest_stop_buy();
 
-
-  // TODO: Perhaps this should be renamed to deleteLimit not deleteLimitFromAVLTree (I believe callers shouldn't know what the implementation of the AVL tree is)
-  void deleteLimitFromAVLTree(Limit *limit, int buyOrSell);
-  void deleteStopLimitFromAVLTree(Limit *limit, int buyOrSell);
+  void delete_limit(Limit* limit, int buy_or_sell);
+  void delete_stop_limit(Limit* limit, int buy_or_sell);
 
 private:
-  Limit *buyTree = nullptr;
-  Limit *sellTree = nullptr;
+  AvlTree<Limit> *buy_tree = nullptr;
+  AvlTree<Limit> *sell_tree = nullptr;
 
-  Limit *stopBuyTree = nullptr;
-  Limit *stopSellTree = nullptr;
+  AvlTree<Limit> *stop_buy_tree = nullptr;
+  AvlTree<Limit> *stop_sell_tree = nullptr;
 
-  Limit *highestBuy;
-  Limit *lowestSell;
+  Limit *highest_buy;
+  Limit *lowest_sell;
 
-  Limit *highestStopSell;
-  Limit *lowestStopBuy;
-
-  // TODO: Why did I do this? - have a pointer to the map?
-  std::unordered_map<int, Limit *> _buyLimitMap = {};
-  std::unordered_map<int, Limit *> *buyLimitMap = &_buyLimitMap;
+  Limit *highest_stop_sell;
+  Limit *lowest_stop_buy;
 
   // TODO: Why did I do this? - have a pointer to the map?
-  std::unordered_map<int, Limit *> _sellLimitMap = {};
-  std::unordered_map<int, Limit *> *sellLimitMap = &_sellLimitMap;
+  std::unordered_map<int, Limit *> _buy_limit_map = {};
+  std::unordered_map<int, Limit *> *buy_limit_map = &_buy_limit_map;
 
   // TODO: Why did I do this? - have a pointer to the map?
-  std::unordered_map<int, Limit *> _stopBuyMap = {};
-  std::unordered_map<int, Limit *> *stopBuyMap = &_stopBuyMap;
+  std::unordered_map<int, Limit *> _sell_limit_map = {};
+  std::unordered_map<int, Limit *> *sell_limit_map = &_sell_limit_map;
+
+  // TODO: Why did I do this? - have a pointer to the map?
+  std::unordered_map<int, Limit *> _stop_buy_map = {};
+  std::unordered_map<int, Limit *> *stop_buy_map = &_stop_buy_map;
   
   // TODO: Why did I do this? - have a pointer to the map?
-  std::unordered_map<int, Limit *> _stopSellMap = {};
-  std::unordered_map<int, Limit *> *stopSellMap = &_stopSellMap;
+  std::unordered_map<int, Limit *> _stop_sell_map = {};
+  std::unordered_map<int, Limit *> *stop_sell_map = &_stop_sell_map;
 
-  void addMarketOrder(Order *order);
-  void addLimitOrder(Order *order);
-  void addStopOrder(Order *order);
+  void place_order(Order *order);
 
-  void addLimitOrderToLimitQueue(Order &order);
-  void addStopOrderToStopQueue(Order &order);
+  void place_market_order(Order *order);
+  void place_limit_order(Order *order);
+  void place_stop_order(Order *order);
 
+  void add_limit_order(Order *order);
+  void add_stop_order(Order *order);
 
-  // TODO: What is the function of the marketOrderHelper?
-  int marketOrderHelper(Limit *limit, Order *order);
-  bool addStopOrderAsMarketOrLimitOrder(Limit *edgeLimit, Order &order);
+  void remove_limit();
+  void remove_stop_limit(Limit* limit, int buy_or_sell);
 
-  void executeStopOrders(int buyOrSell);
+  int market_order_helper(Limit *limit, Order *order);
+  bool add_stop_order_as_market_or_limit_order(Limit* edge_limit, Order* order);
 
-  void insertLimitIntoAVLTree(const int price, const int buyOrSell);
-  void insertStopLimitIntoAVLTree(const int price, const int buyOrSell);
+  void execute_limit_order(Limit* edge, Order *order);
 
-  void updateBookEdgeOnInsert(Limit *newLimit, const LimitType& type);
-  void updateBookEdgeOnDelete(Limit *limit, const LimitType& type);
+  void execute_stop_orders(int buy_or_sell);
 
-  Limit *_insert(Limit *root, const int &price, const LimitType &type,
-                 std::unordered_map<int, Limit *> *limitMap,
-                 Limit *parent);
-
-  Limit *_delete(Limit *root, const int limitPrice);
-  Limit *_stopDelete(Limit *root, const int stopPrice);
-
-  void updateHeight(Limit *root);
-
-  int getHeight(const Limit *node);
-  int getBalance(const Limit *node);
-
-  Limit *getMinValueNode(Limit *node);
-
-  Limit *rotateLeft(Limit *root);
-
-  Limit *rotateRight(Limit *root);
+  void update_book_edge_on_insert(Limit* new_limit, const LimitType& type);
+  void update_book_edge_on_delete(Limit* limit, const LimitType& type);
 
   friend OrderGenerator;
 };

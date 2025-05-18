@@ -1,6 +1,3 @@
-#ifndef AVL_TREE_HPP
-#define AVL_TREE_HPP
-
 template <typename Derived, typename T>
 class Node {
 protected:
@@ -21,6 +18,8 @@ public:
   Derived* get_left_child() const { return left_child; }
   Derived* get_parent() const { return parent; }
 
+  Derived* get_height() const { return height; }
+
   friend bool operator>(Derived *lhs, Derived *rhs) const {
     return lhs->value > rhs->value;
   }
@@ -32,30 +31,6 @@ public:
   friend bool operator==(Derived* lhs, Derived* rhs) const {
     return lhs->value == rhs->value;
   }
+
+  ~Node() = default;
 };
-
-template <typename T>
-class AvlTree {
-public:
-  AvlTree(T* root);
-  
-  void insertNode(T* node);
-  void deleteNode(T* node);
-
-private:
-  T* root;
-
-  T* _insert(T* root, T* node);
-  T* _delete(T* root, T* node);
-
-  T* rotate_left(T* node);
-  T* rotate_right(T* node);
-
-  T* get_min_value_node(T* node);
-
-  void update_height(T* node);
-  int get_height(T* node);
-  int get_balance(T* node);
-};
-
-#endif
