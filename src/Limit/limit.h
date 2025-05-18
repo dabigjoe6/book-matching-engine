@@ -1,6 +1,8 @@
 #ifndef LIMIT_HPP
 #define LIMIT_HPP
 
+#include "avl_node.h"
+
 class Order;
 class OrderBook;
 
@@ -11,24 +13,21 @@ enum class LimitType {
 	StopSell
 };
 
-class Limit {
+class Limit: public Node<Limit, int> {
 
 public: 
-	Limit(OrderBook* orderBook, int price, LimitType type, Limit* parent = nullptr);
+	Limit(int price, LimitType type);
 
-	int getPrice() const;
+	int get_price() const;
 
-	void addOrder(Order* order);
+	void add_order(Order* order);
 
-	int getVolume() const;
+	int get_volume() const;
 
-	Order* getHeadOrder() const;
-	Order* getTailOrder() const;
+	Order* get_head_order() const;
+	Order* get_tail_order() const;
 
-	void execute(Order* headOrder, Order* order);
 private: 
-	OrderBook* orderBook;
-	
 	int price;
 
 	LimitType type;
@@ -37,12 +36,6 @@ private:
 	Order* tailOrder = nullptr;
 
 	int volume = 0;
-
-	Limit* parent = nullptr;
-	Limit* leftLimit = nullptr;
-	Limit* rightLimit = nullptr;
-
-	int height = 0;
 
 	friend class OrderBook;
 };
