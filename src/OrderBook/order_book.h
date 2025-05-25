@@ -4,9 +4,10 @@
 #include <unordered_map>
 
 class Limit;
+template <typename T> class AvlTree;
+
 class Order;
 class OrderGenerator;
-class AvlTree;
 
 enum class LimitType;
 
@@ -63,8 +64,8 @@ private:
   void add_limit_order(Order *order);
   void add_stop_order(Order *order);
 
-  void remove_limit();
-  void remove_stop_limit(Limit* limit, int buy_or_sell);
+  void remove_limit(Limit* edge, bool buy_or_sell);
+  void remove_stop_limit(Limit* limit, bool buy_or_sell);
 
   int market_order_helper(Limit *limit, Order *order);
   bool add_stop_order_as_market_or_limit_order(Limit* edge_limit, Order* order);

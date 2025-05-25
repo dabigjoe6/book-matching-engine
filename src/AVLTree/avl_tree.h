@@ -1,51 +1,24 @@
-#ifndef AVL_TREE_HPP
-#define AVL_TREE_HPP
-
-template <typename Derived, typename T>
-class Node {
-protected:
-  explicit Node(T _value, Derived* _right_child, Derived* _left_child, Derived* _parent);
-
-  T value;
-  Derived* right_child;
-  Derived* left_child;
-  Derived* parent;
-
-  int height;
-
-  friend Derived;
-  friend AvlTree;
-
-public:
-  Derived* get_right_child() const { return right_child; }
-  Derived* get_left_child() const { return left_child; }
-  Derived* get_parent() const { return parent; }
-
-  friend bool operator>(Derived *lhs, Derived *rhs) const {
-    return lhs->value > rhs->value;
-  }
-
-  friend bool operator<(Derived* lhs, Derived* rhs) const {
-    return lhs->value < rhs->value;
-  }
-
-  friend bool operator==(Derived* lhs, Derived* rhs) const {
-    return lhs->value == rhs->value;
-  }
-};
+#ifndef AVL_TREE_H
+#define AVL_TREE_H
 
 template <typename T>
 class AvlTree {
 public:
-  AvlTree(T* root);
-  
-  void insertNode(T* node);
-  void deleteNode(T* node);
+  AvlTree(T* root): root(root) {}
+
+  void insert_node(T* node) {
+    _insert(root, node);
+  }
+
+  void delete_node(T* node) {
+    _delete(root, node);
+  }
+
 
 private:
   T* root;
 
-  T* _insert(T* root, T* node);
+  T* _insert(T* root, T* node, T* parent = nullptr);
   T* _delete(T* root, T* node);
 
   T* rotate_left(T* node);
@@ -56,6 +29,10 @@ private:
   void update_height(T* node);
   int get_height(T* node);
   int get_balance(T* node);
+
+  T* balance_node(T* node);
 };
+
+#include "./avl_tree-inl.h"
 
 #endif

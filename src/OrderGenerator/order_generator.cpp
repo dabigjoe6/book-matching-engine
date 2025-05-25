@@ -86,9 +86,9 @@ void OrderGenerator::process_initial_orders(
     const std::vector<Order *> &read_orders) {
   for (Order *order : read_orders) {
     if (order->get_stop_price() == 0) {
-      order_book->add_limit_order(*order);
+      order_book->add_limit_order(order);
     } else {
-      order_book->add_stop_order(*order);
+      order_book->add_stop_order(order);
     }
   }
 }

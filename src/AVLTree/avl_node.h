@@ -1,17 +1,21 @@
+#ifndef AVL_NODE_HPP
+#define AVL_NODE_HPP
+
 template <typename Derived, typename T>
 class Node {
 protected:
-  explicit Node(T _value, Derived* _right_child, Derived* _left_child, Derived* _parent);
+  explicit Node(T _value, Derived* _right_child = nullptr, Derived* _left_child = nullptr, Derived* _parent = nullptr): 
+              value(_value), right_child(_right_child), left_child(_left_child), parent(_parent) {}
 
   T value;
   Derived* right_child;
   Derived* left_child;
   Derived* parent;
 
-  int height;
+  int height = 0;
 
   friend Derived;
-  friend AvlTree;
+  friend AvlTree<Derived>;
 
 public:
   Derived* get_right_child() const { return right_child; }
@@ -20,17 +24,19 @@ public:
 
   Derived* get_height() const { return height; }
 
-  friend bool operator>(Derived *lhs, Derived *rhs) const {
-    return lhs->value > rhs->value;
+  friend bool operator>(const Derived& lhs, const Derived& rhs) {
+    return lhs.value > rhs.value;
   }
 
-  friend bool operator<(Derived* lhs, Derived* rhs) const {
-    return lhs->value < rhs->value;
+  friend bool operator<(const Derived& lhs, const Derived& rhs) {
+    return lhs.value < rhs.value;
   }
 
-  friend bool operator==(Derived* lhs, Derived* rhs) const {
-    return lhs->value == rhs->value;
+  friend bool operator==(const Derived& lhs, const Derived& rhs) {
+    return lhs.value == rhs.value;
   }
 
   ~Node() = default;
 };
+
+#endif

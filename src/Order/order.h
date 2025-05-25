@@ -4,7 +4,7 @@
 class Order {
 
 public:
-	Order(int id, int shares, int buy_or_sell, int limit_price = 0, int stop_price = 0);
+	Order(int id, int shares, bool buy_or_sell, int limit_price = 0, int stop_price = 0);
 
 	int get_id() const;
 
@@ -16,7 +16,7 @@ public:
 
 	int get_limit_price() const;
 	int get_stop_price() const;
-	int get_buy_or_sell() const;
+	bool get_buy_or_sell() const;
 
 	Order* get_next_order();
 	Order* get_prev_order();
@@ -33,7 +33,7 @@ private:
 	int limit_price = 0;
 	int stop_price = 0;
 
-	int buy_or_sell;
+	bool buy_or_sell;
 
 	Order* next_order = nullptr;
 	Order* prev_order = nullptr;
