@@ -64,7 +64,7 @@ Order *OrderGenerator::generate_order() {
 
   int id = id_distribution(gen);
   int shares = shares_distribution(gen);
-  int buy_or_sell = buy_or_sell_distribution(gen);
+  bool buy_or_sell = buy_or_sell_distribution(gen);
   int limit_price = limit_price_distribution(gen);
 
   int is_stop_price_order = is_stop_price_order_distribution(gen);
@@ -85,13 +85,14 @@ void OrderGenerator::simulate_market() {
 void OrderGenerator::process_initial_orders(
     const std::vector<Order *> &read_orders) {
   for (Order *order : read_orders) {
-    if (order->get_stop_price() == 0) {
+    if (order->get_stop_price() == 0 && order->get_limit_price() != 0) {
       order_book->add_limit_order(order);
     } else {
       order_book->add_stop_order(order);
     }
   }
 }
+
 void OrderGenerator::process_orders(const std::vector<Order *> &read_orders) {
   for (Order *order : read_orders) {
     order_book->place_order(order);
@@ -122,7 +123,7 @@ std::vector<Order *> OrderGenerator::read_orders(const std::string &file_name) {
     int shares;
     iss >> shares;
 
-    int buy_or_sell;
+    bool buy_or_sell;
     iss >> buy_or_sell;
 
     int limit_price;
@@ -131,7 +132,7 @@ std::vector<Order *> OrderGenerator::read_orders(const std::string &file_name) {
     int stop_price;
     iss >> stop_price;
 
-    Order *read_order = new Order(shares, buy_or_sell, limit_price, stop_price);
+    Order *read_order = new Order(order_id, shares, buy_or_sell, limit_price, stop_price);
     read_orders.emplace_back(read_order);
   }
 

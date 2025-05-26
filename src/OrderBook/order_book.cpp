@@ -21,8 +21,9 @@ void OrderBook::place_order(Order *new_order) {
   // market order
   // We assume for a market order the limit price and stop price are set to 0
   if (new_order->get_limit_price() == 0 && new_order->get_stop_price() == 0) {
-    std::cout << std::left << std::setw(5)
-              << (new_order->get_buy_or_sell() ? "Buy" : "Sell") << std::setw(29)
+    std::cout << std::left
+              << "ID " << std::setw(8) << new_order->get_id()
+              << std::setw(5) << (new_order->get_buy_or_sell() ? "Buy" : "Sell") << std::setw(26)
               << "[MARKET ORDER SUBMITTED]" << " for " << new_order->get_shares()
               << "\n";
     place_market_order(new_order);
@@ -32,8 +33,9 @@ void OrderBook::place_order(Order *new_order) {
   // limit order
   // We assume for a limit order the stop price is set to 0
   if (new_order->get_limit_price() > 0 && new_order->get_stop_price() == 0) {
-    std::cout << std::left << std::setw(5)
-              << (new_order->get_buy_or_sell() ? "Buy" : "Sell") << std::setw(29)
+    std::cout << std::left 
+              << "ID " << std::setw(8) << new_order->get_id()
+              << std::setw(5) << (new_order->get_buy_or_sell() ? "Buy" : "Sell") << std::setw(26)
               << "[LIMIT ORDER SUBMITTED]" << " for " << new_order->get_shares()
               << " @ Limit Price: " << new_order->get_limit_price() << "\n";
     place_limit_order(new_order);
@@ -43,16 +45,17 @@ void OrderBook::place_order(Order *new_order) {
   // stop order or stop limit order
   if (new_order->get_stop_price() > 0) {
     if (new_order->get_stop_price() > 0 && new_order->get_limit_price() == 0) {
-      std::cout << std::left << std::setw(5)
-                << (new_order->get_buy_or_sell() ? "Buy" : "Sell") << std::setw(29)
+      std::cout << std::left
+                << "ID " << std::setw(8) << new_order->get_id()
+                << std::setw(5) << (new_order->get_buy_or_sell() ? "Buy" : "Sell") << std::setw(26)
                 << "[STOP ORDER SUBMITTED]" << " for " << new_order->get_shares()
                 << " @ Limit Price: " << new_order->get_limit_price()
                 << " @ Stop Price:" << new_order->get_stop_price() << "\n";
     } else {
-      std::cout << std::left << std::setw(5)
-                << (new_order->get_buy_or_sell() ? "Buy" : "Sell") << std::setw(29)
-                << "[STOP LIMIT ORDER SUBMITTED]" << " for "
-                << new_order->get_shares()
+      std::cout << std::left
+                << "ID " << std::setw(8) << new_order->get_id()
+                << std::setw(5) << (new_order->get_buy_or_sell() ? "Buy" : "Sell") << std::setw(26)
+                << "[STOP LIMIT ORDER SUBMITTED]" << " for " << new_order->get_shares()
                 << " @ Limit Price: " << new_order->get_limit_price()
                 << " @ Stop Price: " << new_order->get_stop_price() << "\n";
     }
@@ -237,7 +240,7 @@ void OrderBook::add_limit_order(Order* order) {
     // on the tree depending on the side (buy/sell)
     Limit* limit = new Limit(order->get_limit_price(), limitType);
     limit_map->try_emplace(order->get_limit_price(), limit);
-    AvlTree<Limit>* tree = order->get_buy_or_sell() ? buy_tree : sell_tree;
+    AvlTree<Limit>*& tree = order->get_buy_or_sell() ? buy_tree : sell_tree;
     if (tree == nullptr) {
       tree = new AvlTree<Limit>(limit);
     } else {
@@ -290,7 +293,7 @@ void OrderBook::add_stop_order(Order* order) {
   if (stop_map->find(stop_price) == stop_map->end()) {
     Limit* limit = new Limit(stop_price, limitType);
     stop_map->try_emplace(stop_price, limit);
-    AvlTree<Limit>* tree = order->get_buy_or_sell() ? stop_buy_tree : stop_sell_tree;
+    AvlTree<Limit>*& tree = order->get_buy_or_sell() ? stop_buy_tree : stop_sell_tree;
     if (tree == nullptr) {
       tree = new AvlTree<Limit>(limit);
     } else {
