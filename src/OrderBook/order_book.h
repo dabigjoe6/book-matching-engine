@@ -70,7 +70,7 @@ private:
   int market_order_helper(Limit *limit, Order *order);
   bool add_stop_order_as_market_or_limit_order(Limit* edge_limit, Order* order);
 
-  void execute_limit_order(Limit* edge, Order *order);
+  void execute_limit_order(Limit* edge, Order*& order);
 
   void execute_stop_orders(int buy_or_sell);
 

@@ -24,16 +24,16 @@ public:
 
   Derived* get_height() const { return height; }
 
-  friend bool operator>(const Derived& lhs, const Derived& rhs) {
-    return lhs.value > rhs.value;
+  friend bool operator>(const Node& lhs, const Node& rhs) {
+    return static_cast<const Derived&>(lhs).value > static_cast<const Derived&>(rhs).value;
   }
 
-  friend bool operator<(const Derived& lhs, const Derived& rhs) {
-    return lhs.value < rhs.value;
+  friend bool operator<(const Node& lhs, const Node& rhs) {
+    return static_cast<const Derived&>(lhs).value < static_cast<const Derived&>(rhs).value;
   }
 
-  friend bool operator==(const Derived& lhs, const Derived& rhs) {
-    return lhs.value == rhs.value;
+  friend bool operator==(const Node& lhs, const Node& rhs) {
+    return static_cast<const Derived&>(lhs).value == static_cast<const Derived&>(rhs).value;
   }
 
   ~Node() = default;

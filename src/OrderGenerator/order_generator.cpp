@@ -87,7 +87,7 @@ void OrderGenerator::process_initial_orders(
   for (Order *order : read_orders) {
     if (order->get_stop_price() == 0 && order->get_limit_price() != 0) {
       order_book->add_limit_order(order);
-    } else {
+    } else if (order->get_stop_price() != 0) {
       order_book->add_stop_order(order);
     }
   }

@@ -6,7 +6,11 @@
 #include "../OrderBook/order_book.h"
 #include "limit.h"
 
-Limit::Limit(int _price, LimitType _type): Node<Limit, int>(_price), price(_price), type(_type) {};
+Limit::Limit(int _price, LimitType _type, Order* head_order): Node<Limit, int>(_price), price(_price), type(_type), head_order(head_order), tail_order(head_order) {
+  if (head_order != nullptr) {
+    volume += head_order->get_shares();
+  }
+};
 
 
 void Limit::add_order(Order *order) {
@@ -27,7 +31,6 @@ void Limit::add_order(Order *order) {
 
 
 int Limit::get_price() const { return value; }
-int Limit::get_shares() const { return shares; }
 int Limit::get_volume() const { return volume; }
 
 Order *Limit::get_head_order() const { return head_order; }

@@ -16,12 +16,11 @@ enum class LimitType {
 class Limit: public Node<Limit, int> {
 
 public: 
-	explicit Limit(int _price, LimitType _type);
+	explicit Limit(int _price, LimitType _type, Order* order=nullptr);
 
 	void add_order(Order* order);
 
 	int get_price() const;
-	int get_shares() const;
 	int get_volume() const;
 
 	Order* get_head_order() const;
@@ -29,14 +28,13 @@ public:
 
 private: 
 	int price;
-	int shares;
+	int volume = 0;
 
 	LimitType type;
 	
 	Order* head_order = nullptr; 
 	Order* tail_order = nullptr;
 
-	int volume = 0;
 
 	friend class OrderBook;
 };

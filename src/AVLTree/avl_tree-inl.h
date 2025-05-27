@@ -10,9 +10,9 @@ T* AvlTree<T>::_insert(T* root, T* node, T* parent) {
     return node; 
   }
 
-  if (node < root) {
+  if (*node < *root) {
     root->left_child = _insert(root->left_child, node, root);
-  } else if (node > root) {
+  } else if (*node > *root) {
     root->right_child = _insert(root->right_child, node, root);
   } else {
     return root; // no 2 nodes with the same value
@@ -23,31 +23,39 @@ T* AvlTree<T>::_insert(T* root, T* node, T* parent) {
 }
 
 template<typename T>
-T* AvlTree<T>::_delete(T* root, T* node) {
+T* AvlTree<T>::_delete(T*& root, T* node, T* parent) {
   if (root == nullptr) {
     return root;
   }
 
-  if (node < root) {
-    root->left_child = _delete(root->left_child, node);
-  } else if (node > root) {
-    root->right_child = _delete(root->right_child, node);
+  if (*node < *root) {
+    root->left_child = _delete(root->left_child, node, root);
+  } else if (*node > *root) {
+    root->right_child = _delete(root->right_child, node, root);
   } else {
     if (root->left_child == nullptr) {
       T* temp = root->right_child;
+      if (temp != nullptr) {
+        temp->parent = parent;
+      }
       delete root;
-      return temp;
+      root = temp;
+      return root;
     } 
 
     if (root->right_child == nullptr) {
       T* temp = root->left_child;
+      if (temp != nullptr) {
+        temp->parent = parent;
+      }
       delete root;
-      return temp;
+      root = temp;
+      return root;
     }
 
     T* temp = get_min_value_node(root->right_child);
     root->value = temp->value;
-    root->right_child = _delete(root->right_child, temp);
+    root->right_child = _delete(root->right_child, temp, root);
   }
 
   update_height(root);

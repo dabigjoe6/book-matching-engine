@@ -19,7 +19,7 @@ private:
   T* root;
 
   T* _insert(T* root, T* node, T* parent = nullptr);
-  T* _delete(T* root, T* node);
+  T* _delete(T*& root, T* node, T* parent = nullptr);
 
   T* rotate_left(T* node);
   T* rotate_right(T* node);
