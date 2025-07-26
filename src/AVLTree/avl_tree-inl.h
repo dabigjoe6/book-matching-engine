@@ -4,22 +4,24 @@
 #include <algorithm>
 
 template<typename T>
-T* AvlTree<T>::_insert(T* root, T* node, T* parent) {
- if (root == nullptr) {
+void AvlTree<T>::_insert(T*& root, T* node, T* parent) {
+  if (root == nullptr) {
     node->parent = parent;
-    return node; 
+    root = node;
+    return; 
   }
 
-  if (*node < *root) {
-    root->left_child = _insert(root->left_child, node, root);
-  } else if (*node > *root) {
-    root->right_child = _insert(root->right_child, node, root);
-  } else {
-    return root; // no 2 nodes with the same value
-  }
+  // ignore duplicate nodes
+  if (*node != *root) {
+    if (*node < *root) {
+      _insert(root->left_child, node, root);
+    } else if (*node > *root) {
+      _insert(root->right_child, node, root);
+    }
 
-  update_height(root);
-  return balance_node(root);
+    update_height(root);
+    root = balance_node(root);
+  }
 }
 
 template<typename T>
