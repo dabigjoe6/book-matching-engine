@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.29.0)
 
+set(CMAKE_OSX_SYSROOT, /Library/Developer/CommandLineTools/SDKs/MacOSX15.5.sdk)
+
 set(PROJECT_NAME LimitOrderBook)
 
 project(LimitOrderBook VERSION 0.1.0)
@@ -9,14 +11,17 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 set(CMAKE_BUILD_TYPE Debug)
 
 enable_testing()
-
 add_subdirectory(./googletest)
+add_subdirectory(./test)
 
 set(Headers
 	./src/Order/order.h
 	./src/Limit/limit.h
 	./src/OrderBook/order_book.h
 	./src/OrderGenerator/order_generator.h
+	./src/AVLTree/avl_node.h
+	./src/AVLTree/avl_tree.h
+	./src/AVLTree/avl_tree-inl.h
 )
 
 set(Sources
