@@ -33,11 +33,11 @@ private:
   AvlTree<Limit> *stop_buy_tree = nullptr;
   AvlTree<Limit> *stop_sell_tree = nullptr;
 
-  Limit *highest_buy;
-  Limit *lowest_sell;
+  Limit *highest_buy = nullptr;
+  Limit *lowest_sell = nullptr;
 
-  Limit *highest_stop_sell;
-  Limit *lowest_stop_buy;
+  Limit *highest_stop_sell = nullptr;
+  Limit *lowest_stop_buy = nullptr;
 
   // TODO: Why did I do this? - have a pointer to the map?
   std::unordered_map<int, Limit *> _buy_limit_map = {};
