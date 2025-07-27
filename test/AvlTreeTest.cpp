@@ -192,3 +192,34 @@ TEST_F(AvlTreeTests, AvlTreeLeftRotation) {
   EXPECT_EQ(tree->get_root()->get_right_child()->get_value(), 20);
   EXPECT_EQ(tree->get_root()->get_right_child()->get_height(), 0);
 }
+
+TEST_F(AvlTreeTests, AvlTreeDeletingNodeWithOnlyLeftChild) {
+/*
+*                8                              8
+*               /  \     Deleting node 7      /   \            
+*              7   10       --->            6     10
+*             /
+*            6
+*/
+
+  LimitType limitType = LimitType::LimitBuy;
+
+  Limit* nodeA = new Limit(10, limitType);
+  Limit* nodeB = new Limit(8, limitType);
+  Limit* nodeC = new Limit(7, limitType);
+  Limit* nodeD = new Limit(6, limitType);
+
+  AvlTree<Limit>* tree = new AvlTree<Limit>(nodeA);
+
+  tree->insert_node(nodeB);
+  tree->insert_node(nodeC);
+  tree->insert_node(nodeD);
+
+  EXPECT_EQ(tree->get_root()->get_value(), 8);
+  EXPECT_EQ(tree->get_root()->get_left_child()->get_value(), 7);
+
+  tree->delete_node(nodeC);
+
+  EXPECT_EQ(tree->get_root()->get_value(), 8);
+  EXPECT_EQ(tree->get_root()->get_left_child()->get_value(), 6);
+}
