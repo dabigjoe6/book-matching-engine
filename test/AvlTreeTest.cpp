@@ -223,3 +223,35 @@ TEST_F(AvlTreeTests, AvlTreeDeletingNodeWithOnlyLeftChild) {
   EXPECT_EQ(tree->get_root()->get_value(), 8);
   EXPECT_EQ(tree->get_root()->get_left_child()->get_value(), 6);
 }
+
+TEST_F(AvlTreeTests, AvlTreeDeletingNodeWithOnlyRightChild) {
+/*
+*                8                             8
+*               /  \     Deleting node 10    /   \            
+*              7   10       --->            7     12
+*                    \
+*                    12
+*
+*/
+
+  LimitType limitType = LimitType::LimitBuy;
+
+  Limit* nodeA = new Limit(10, limitType);
+  Limit* nodeB = new Limit(8, limitType);
+  Limit* nodeC = new Limit(7, limitType);
+  Limit* nodeD = new Limit(12, limitType);
+
+  AvlTree<Limit>* tree = new AvlTree<Limit>(nodeA);
+
+  tree->insert_node(nodeB);
+  tree->insert_node(nodeC);
+  tree->insert_node(nodeD);
+
+  EXPECT_EQ(tree->get_root()->get_value(), 8);
+  EXPECT_EQ(tree->get_root()->get_right_child()->get_value(), 10);
+
+  tree->delete_node(nodeA);
+
+  EXPECT_EQ(tree->get_root()->get_value(), 8);
+  EXPECT_EQ(tree->get_root()->get_right_child()->get_value(), 12);
+}
