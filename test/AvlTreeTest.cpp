@@ -112,3 +112,83 @@ TEST_F(AvlTreeTests, AvlTreeLeftRightRotation) {
   EXPECT_EQ(tree->get_root()->get_right_child()->get_value(), 10);
   EXPECT_EQ(tree->get_root()->get_right_child()->get_height(), 0);
 }
+
+TEST_F(AvlTreeTests, AvlTreeRightRotation) {
+/*
+*                                                 8
+*                10                              /  \
+*               /                              /      \
+*              8           --->               7       10
+*             /
+*            7
+*
+*/
+
+  LimitType limitType = LimitType::LimitBuy;
+
+  Limit* node1 = new Limit(10, limitType);
+  AvlTree<Limit>* tree = new AvlTree<Limit>(node1);
+
+  EXPECT_EQ(tree->get_root()->get_value(), 10);
+
+  Limit* node2 = new Limit(8, limitType);
+  tree->insert_node(node2);
+
+  EXPECT_EQ(tree->get_root()->get_value(), 10);
+  EXPECT_EQ(tree->get_root()->get_height(), 1);
+  EXPECT_EQ(tree->get_root()->get_left_child()->get_value(), 8);
+  EXPECT_EQ(tree->get_root()->get_left_child()->get_height(), 0);
+
+  Limit* node3 = new Limit(7, limitType);
+  tree->insert_node(node3);
+
+  // Right rotation
+  EXPECT_EQ(tree->get_root()->get_value(), 8);
+  EXPECT_EQ(tree->get_root()->get_height(), 1);
+
+  EXPECT_EQ(tree->get_root()->get_left_child()->get_value(), 7);
+  EXPECT_EQ(tree->get_root()->get_left_child()->get_height(), 0);
+
+  EXPECT_EQ(tree->get_root()->get_right_child()->get_value(), 10);
+  EXPECT_EQ(tree->get_root()->get_right_child()->get_height(), 0);
+}
+
+
+TEST_F(AvlTreeTests, AvlTreeLeftRotation) {
+/*
+*                                                 15
+*                10                              /  \
+*                  \                           /      \
+*                   15      --->              10       20
+*                     \
+*                      20
+*/
+
+  LimitType limitType = LimitType::LimitBuy;
+
+  Limit* node1 = new Limit(10, limitType);
+  AvlTree<Limit>* tree = new AvlTree<Limit>(node1);
+
+  EXPECT_EQ(tree->get_root()->get_value(), 10);
+
+  Limit* node2 = new Limit(15, limitType);
+  tree->insert_node(node2);
+
+  EXPECT_EQ(tree->get_root()->get_value(), 10);
+  EXPECT_EQ(tree->get_root()->get_height(), 1);
+  EXPECT_EQ(tree->get_root()->get_right_child()->get_value(), 15);
+  EXPECT_EQ(tree->get_root()->get_right_child()->get_height(), 0);
+
+  Limit* node3 = new Limit(20, limitType);
+  tree->insert_node(node3);
+
+  // Left rotation
+  EXPECT_EQ(tree->get_root()->get_value(), 15);
+  EXPECT_EQ(tree->get_root()->get_height(), 1);
+
+  EXPECT_EQ(tree->get_root()->get_left_child()->get_value(), 10);
+  EXPECT_EQ(tree->get_root()->get_left_child()->get_height(), 0);
+
+  EXPECT_EQ(tree->get_root()->get_right_child()->get_value(), 20);
+  EXPECT_EQ(tree->get_root()->get_right_child()->get_height(), 0);
+}
