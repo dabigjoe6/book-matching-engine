@@ -4,7 +4,7 @@
 template <typename T>
 class AvlTree {
 public:
-  AvlTree(T* root): root(root) {}
+  AvlTree(T* root=nullptr): root(root) {}
 
   void insert_node(T* node) {
     _insert(root, node);
@@ -14,11 +14,14 @@ public:
     _delete(root, node);
   }
 
+  T* get_root() {
+    return root;
+  }
 
 private:
   T* root;
 
-  T* _insert(T* root, T* node, T* parent = nullptr);
+  void _insert(T*& root, T* node, T* parent = nullptr);
   T* _delete(T*& root, T* node, T* parent = nullptr);
 
   T* rotate_left(T* node);

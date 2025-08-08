@@ -18,11 +18,12 @@ protected:
   friend AvlTree<Derived>;
 
 public:
+  T get_value() const { return value; }
   Derived* get_right_child() const { return right_child; }
   Derived* get_left_child() const { return left_child; }
   Derived* get_parent() const { return parent; }
 
-  Derived* get_height() const { return height; }
+  int get_height() const { return height; }
 
   friend bool operator>(const Node& lhs, const Node& rhs) {
     return static_cast<const Derived&>(lhs).value > static_cast<const Derived&>(rhs).value;
@@ -34,6 +35,10 @@ public:
 
   friend bool operator==(const Node& lhs, const Node& rhs) {
     return static_cast<const Derived&>(lhs).value == static_cast<const Derived&>(rhs).value;
+  }
+
+  friend bool operator!=(const Node& lhs, const Node& rhs) {
+    return static_cast<const Derived&>(lhs).value != static_cast<const Derived&>(rhs).value; 
   }
 
   ~Node() = default;

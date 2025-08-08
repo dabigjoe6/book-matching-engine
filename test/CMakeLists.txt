@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.29.0)
 set(TEST_PROJECT_NAME LimitOrderBookTest)
 
 set(Sources
-		./LimitTest.cpp
+		./AvlTreeTest.cpp
 )
 
 add_executable(${TEST_PROJECT_NAME} ${Sources})
